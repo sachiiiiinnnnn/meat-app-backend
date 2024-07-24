@@ -7,11 +7,12 @@ const ProductModal = function (req) {};
 const baseUrl = "http://192.168.1.12:8080/uploads/products"; // Update this with your server address
 
 ProductModal.product = (input, output) => {
-  const { productName, productDescription, gram, pieces, price, stocks, categoryName, image, productStatus } = input;
+  const { productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity } = input;
+  console.log(input);
   const status = productStatus ? 1 : 0;
-  const insertProduct = `INSERT INTO productDetails (productName, productDescription, gram, pieces, price, stocks, categoryName, image, productStatus) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const insertProduct = `INSERT INTO productDetails (productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  pool.query(insertProduct, [productName, productDescription, gram, pieces, price, stocks, categoryName,  , status], (err, result) => {
+  pool.query(insertProduct, [productName, productDescription, mass, pieces, price, categoryName, image, status,  quantity], (err, result) => {
     if (err) output({ error: { description: err.message } }, null);
     else {
       output(null, { message: "Product details inserted successfully" });

@@ -6,8 +6,9 @@ exports.Booking = (req, res) => {
 
     const invalidBooking = bookings.some(booking =>
         !booking.productId || !booking.customerId || !booking.productName ||
-        !booking.quantity || !booking.amount || !booking.locationId
-    );
+        !booking.quantity || !booking.amount || !booking.locationId || 
+        !booking.categoryId || !booking.paymentMode || !booking.bookingStatus
+    ); 
 
     if (invalidBooking) {
         res.status(400).send({ message: "Check data" });

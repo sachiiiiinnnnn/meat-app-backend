@@ -7,7 +7,7 @@ BookingModal.booking = (input, output) => {
     const bookings = Array.isArray(input) ? input : [input]; // Ensure bookings is an array
 
     const processBooking = (booking, callback) => {
-        const { productId, customerId, productName, quantity, amount, locationId } = booking;
+        const { productId, customerId, locationId, productName, quantity, amount, categoryId, paymentMode, bookingStatus } = booking;
         const bookingDate = new Date().toISOString().split('T')[0]; // Automatically generate current date in 'YYYY-MM-DD' format
         const bookingTime = new Date().toISOString().split('T')[1].split('.')[0]; // Automatically generate current time in 'HH:MM:SS' format
 
@@ -24,8 +24,8 @@ BookingModal.booking = (input, output) => {
                     callback({ error: { description: `Only ${productData.stocks} items available in stock` } });
                 } else {
                     // Proceed with booking if enough stock is available
-                    const insertBooking = `INSERT INTO bookingDetails (productId, customerId, productName, quantity, amount, bookingDate, bookingTime, locationId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-                    const values = [productId, customerId, productName, quantity, amount, bookingDate, bookingTime, locationId];
+                    const insertBooking = `INSERT INTO bookingDetails (productId, customerId, locationId, productName, quantity, amount, paymentMode, bookingDate, bookingTime, bookingStatus, categoryId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+                    const values = [productId, customerId, locationId, productName, quantity, amount, paymentMode, bookingDate, bookingTime, bookingStatus, categoryId];
 
                     pool.query(insertBooking, values, (err, result) => {
                         if (err) {

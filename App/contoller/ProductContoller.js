@@ -4,16 +4,17 @@ const ProductModal = require("../Modal/ProductModal");
 exports.Product = (req, res) => {
   const productName = req.body.productName;
   const productDescription = req.body.productDescription;
-  const gram = req.body.gram;
+  const mass = req.body.mass;
   const pieces = req.body.pieces;
   const price = req.body.price;
-  const stocks = req.body.stocks;
   const categoryName = req.body.categoryName;
-  const productStatus = req.body.productStatus === '1' ? 1 : 0;
+  const productStatus = req.body.productStatus === "true" ? 1 : 0;
   const image = req.file ? req.file.filename : null;
+  const quantity = req.body.quantity;
+  console.log(productName, productDescription, mass, pieces, price, categoryName, image, quantity);
 
   try {
-    if (!productName || !productDescription || !gram || !pieces || !price || !stocks || !categoryName) {
+    if (!productName || !productDescription || !mass || !pieces || !price  || !categoryName || !quantity) {
       res.status(400).send({ message: "Check data" });
     } else {
       ProductModal.product({ ...req.body, productStatus, image }, (err, data) => {
@@ -62,15 +63,15 @@ exports.getProductByCategory = (req, res) => {
 };
 
 exports.updateProduct = (req, res) => {
-  const { productId, productName, productDescription, gram, pieces, price, stocks, categoryName, productStatus } = req.body;
+  const { productId, productName, productDescription, mass, pieces, price, categoryName, productStatus, quantity } = req.body;
   const image = req.file ? req.file.filename : null;
-  const status = productStatus === '1' ? 1 : 0;
+  const status = productStatus === "true" ? 1 : 0;
 
   try {
-    if (!productId || !productName || !productDescription || !gram || !pieces || !price || !stocks || !categoryName) {
+    if (!productId || !productName || !productDescription || !mass || !pieces || !price || !categoryName || !quantity) {
       res.status(400).send({ message: "Check data" });
     } else {
-      ProductModal.updateProduct({ productId, productName, productDescription, gram, pieces, price, stocks, categoryName, image, productStatus: status }, (err, data) => {
+      ProductModal.updateProduct({ productId, productName, productDescription, mass, pieces, price, quantity, categoryName, image, productStatus: status }, (err, data) => {
         if (err) res.status(400).send(err.error);
         else res.send(data);
       });

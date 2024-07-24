@@ -3,7 +3,7 @@ const mysql = require("mysql2");
 const pool = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "678905k7",
+  password: "root",
   database: "meals",
   port: 3306,
   multipleStatements: true,
@@ -64,7 +64,8 @@ const createBookingDetails = `CREATE  TABLE IF NOT EXISTS  bookingDetails (
     bookingTime TIME NOT NULL,  -- Added bookingTime with TIME data type
     FOREIGN KEY (productId) REFERENCES productDetails(productId),
     FOREIGN KEY (customerId) REFERENCES customerDetails(customerId),
-    FOREIGN KEY (locationId) REFERENCES locationDetails(locationId)
+    FOREIGN KEY (locationId) REFERENCES locationDetails(locationId),
+    FOREIGN KEY (categoryId) REFERENCES locationDetails(categoryId)
 );`;
 
 const otp = `CREATE  TABLE IF NOT EXISTS otp(
@@ -73,6 +74,16 @@ const otp = `CREATE  TABLE IF NOT EXISTS otp(
     customerId INT NOT NULL,
     PRIMARY KEY (otpId),
     FOREIGN KEY (customerId) REFERENCES customerDetails(customerId)
+);`;
+
+const createstockdetail =`CREATE TABLE IF NOT EXISTs stockdetails (
+stockId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+stock INT NOT NULL, 
+stockdate DATE NOT NULL, 
+categoryId INT NOT NULL,
+productId INT NOT NULL, 
+FOREIGN KEY (categoryId) REFERENCES categoryDetails(categoryId),
+FOREIGN KEY (productId) REFERENCES productDetails(productId)
 );`;
 
     // Execute each query separately
@@ -106,6 +117,10 @@ const otp = `CREATE  TABLE IF NOT EXISTS otp(
       else console.log("otp table created successfully");
     });
     
+    pool.query(createstockdetail, function(err, results, fields) {
+      if(err) console.log(err.message);
+      else console.log("stockdetail table create successfully");
+    })
   } catch (e) {
     console.log(e.message);
   }

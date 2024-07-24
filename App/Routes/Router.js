@@ -11,6 +11,7 @@ module.exports = (App) => {
   const Location = require("../contoller/LocationController");
   const Booking = require("../contoller/BookingController");
   const Search = require("../contoller/SearchController");
+  const Stock = require("../contoller/StockController");
 
   
 
@@ -73,6 +74,8 @@ module.exports = (App) => {
 
   router.get("/user/Search", Search.getSearch);
   router.get("/user/SearchProduct", Search.getSearchProduct);
+
+  router.post("user/stock", Stock.Stock);
 
 
   const log = (req, res, next) => {
