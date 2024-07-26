@@ -1,7 +1,10 @@
 const pool = require("../Configuration/Config");
+const twilioDeatils = require("../../index")
+const client = require("twilio")(twilioDeatils.accountSid, twilioDeatils.authToken);
 const { Login } = require("../contoller/LoginController");
 
-const LoginModal = function (req) {};
+
+const LoginModal = function (req) { };
 
 LoginModal.login = (input, output) => {
   const { otp, customerId } = input;
@@ -34,7 +37,7 @@ LoginModal.updateUserDetails = (input, output) => {
         return output({ error: { description: err.message } }, null);
       }
 
-      output(null, { message: "User details updated successfully",  result });
+      output(null, { message: "User details updated successfully", result });
     });
   });
 };
@@ -97,7 +100,15 @@ LoginModal.insertOtp = (input, output) => {
 
   pool.query(insertOtp, [otp, customerId], (err, result) => {
     if (err) return output({ error: { description: err.message } }, null);
-    output(null, { message: "OTP generated and saved successfully",customerId:customerId });
+    client.messages
+      .create({
+        body: `Dear Customer, this is your OTP ${otp} `,
+        from: "+19123015569",
+        to: "+918220877296",
+      })
+      .then((message) => console.log(message.sid))
+      .catch((error) => console.error("Error sending message:", error));
+    output(null, { message: "OTP generated and saved successfully", customerId: customerId });
   });
 };
 
@@ -108,6 +119,14 @@ LoginModal.updateOtp = (input, output) => {
 
   pool.query(updateOtp, [otp, customerId], (err, result) => {
     if (err) return output({ error: { description: err.message } }, null);
+    client.messages
+      .create({
+        body: `Dear Customer, this is your OTP ${otp} `,
+        from: "+19123015569",
+        to: "+918220877296",
+      })
+      .then((message) => console.log(message.sid))
+      .catch((error) => console.error("Error sending message:", error));
     output(null, { message: "OTP updated successfully" });
   });
 };

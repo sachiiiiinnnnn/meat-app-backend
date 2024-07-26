@@ -4,14 +4,14 @@ const pool = require("../Configuration/Config");
 
 const SearchModal = function (req) {};
 
-const baseUrl = "http://192.168.1.12:8080/uploads/products"; // Update with your server's base URL for product images
+const baseUrl = "http://192.168.1.8:8080/uploads/products"; // Update with your server's base URL for product images
 
 SearchModal.getSearch = (categoryName, productName, callback) => {
     let query = 'SELECT * FROM productDetails WHERE productName LIKE ?';
     const params = [`%${productName}%`];
 
     if (categoryName) {
-        query += ' AND categoryName = ?';
+        query += ' AND categoryName = ?';  
         params.push(categoryName);
     }
 
