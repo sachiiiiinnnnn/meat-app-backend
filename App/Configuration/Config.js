@@ -35,24 +35,25 @@ pool.connect(function (err) {
     productId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     productName VARCHAR(250) NOT NULL,
     productDescription VARCHAR(250) NOT NULL,
-    gram VARCHAR(250) NOT NULL,
+    mass VARCHAR(250) NOT NULL,
     pieces INT NOT NULL,
     price INT NOT NULL,
-    stocks INT NOT NULL,
     categoryName VARCHAR(250) NOT NULL,
     image VARCHAR(250) NOT NULL,
     productStatus BOOLEAN NOT NULL,
+    quantity INT NOT NULL,
+    quantity BOOLEAN NOT NULL,
     FOREIGN KEY (categoryName) REFERENCES categoryDetails(categoryName)
 )`;
 
-const createLocationDetails = `CREATE  TABLE IF NOT EXISTS   locationDetails (
+    const createLocationDetails = `CREATE  TABLE IF NOT EXISTS   locationDetails (
     locationId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     customerId INT NOT NULL,
     location VARCHAR(250) NOT NULL,
     FOREIGN KEY (customerId) REFERENCES customerDetails(customerId)
 )`;
 
-const createBookingDetails = `CREATE  TABLE IF NOT EXISTS  bookingDetails (
+    const createBookingDetails = `CREATE  TABLE IF NOT EXISTS  bookingDetails (
     bookingId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     productId INT NOT NULL,
     customerId INT NOT NULL,
@@ -60,15 +61,16 @@ const createBookingDetails = `CREATE  TABLE IF NOT EXISTS  bookingDetails (
     productName VARCHAR(250) NOT NULL,
     quantity INT NOT NULL,
     amount INT NOT NULL,
+    paymentMode VARCHAR(250) NOT NULL,
     bookingDate DATE NOT NULL,
-    bookingTime TIME NOT NULL,  -- Added bookingTime with TIME data type
+    bookingTime TIME NOT NULL,  
     FOREIGN KEY (productId) REFERENCES productDetails(productId),
     FOREIGN KEY (customerId) REFERENCES customerDetails(customerId),
     FOREIGN KEY (locationId) REFERENCES locationDetails(locationId),
     FOREIGN KEY (categoryId) REFERENCES locationDetails(categoryId)
 );`;
 
-const otp = `CREATE  TABLE IF NOT EXISTS otp(
+    const otp = `CREATE  TABLE IF NOT EXISTS otp(
     otpId INT NOT NULL AUTO_INCREMENT,
     otp VARCHAR(250) NOT NULL,
     customerId INT NOT NULL,
@@ -76,7 +78,7 @@ const otp = `CREATE  TABLE IF NOT EXISTS otp(
     FOREIGN KEY (customerId) REFERENCES customerDetails(customerId)
 );`;
 
-const createstockdetail =`CREATE TABLE IF NOT EXISTs stockdetails (
+    const createstockdetail = `CREATE TABLE IF NOT EXISTS stockdetails (
 stockId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
 stock INT NOT NULL, 
 stockdate DATE NOT NULL, 
@@ -85,6 +87,24 @@ productId INT NOT NULL,
 FOREIGN KEY (categoryId) REFERENCES categoryDetails(categoryId),
 FOREIGN KEY (productId) REFERENCES productDetails(productId)
 );`;
+
+    const createofferdetail = `CREATE TABLE IF NOT EXISTS offerdetails (
+    offerId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    offerCode VARCHAR(255) NOT NULL,
+    offerType VARCHAR(255) NOT NULL,
+    categoryId INT NOT NULL,
+    productId INT NOT NULL,
+    offerPercentage INT NOT NULL,
+    maxDiscount INT NOT NULL,
+    usageLimit INT NOT NULL,
+    fromDate DATE NOT NULL,
+    endDate DATE NOT NULL,
+    customerType VARCHAR(255) NOT NULL,
+    customerId INT NOT NULL,
+    FOREIGN KEY (productId) REFERENCES productDetails(productId),
+    FOREIGN KEY (customerId) REFERENCES customerDetails(customerId),
+    FOREIGN KEY (categoryId) REFERENCES categoryDetails(categoryId)
+    ); `;
 
     // Execute each query separately
     pool.query(createCustomerDetails, function (err, results, fields) {
@@ -111,20 +131,24 @@ FOREIGN KEY (productId) REFERENCES productDetails(productId)
       if (err) console.log(err.message);
       else console.log("bookingDetails table created successfully");
     });
-    
+
     pool.query(otp, function (err, results, fields) {
       if (err) console.log(err.message);
       else console.log("otp table created successfully");
     });
-    
-    pool.query(createstockdetail, function(err, results, fields) {
-      if(err) console.log(err.message);
+
+    pool.query(createstockdetail, function (err, results, fields) {
+      if (err) console.log(err.message);
       else console.log("stockdetail table create successfully");
+    });
+
+    pool.query(createofferdetail, function (err, result, fields) {
+      if(err) console.log(err.message);
+      else console.log("Offerdetail table create successfully");
     })
   } catch (e) {
     console.log(e.message);
   }
-  
 });
 
 module.exports = pool;

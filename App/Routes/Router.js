@@ -12,6 +12,7 @@ module.exports = (App) => {
   const Booking = require("../contoller/BookingController");
   const Search = require("../contoller/SearchController");
   const Stock = require("../contoller/StockController");
+  const Offer = require("../contoller/OfferController");
 
   
 
@@ -47,8 +48,7 @@ module.exports = (App) => {
   router.post("/user/Login", Login.Login); 
   router.get("/user/Login", Login.getLogin);
   router.get("/user/Login/CustomerId", Login.getCustomerId);
-
-  router.post("/user/Login/Otp", Login.generateOtp); 
+   router.post("/user/Login/Otp", Login.generateOtp); 
 
   
   router.post("/user/Category", uploadCategory.single('image'), Category.Category);
@@ -75,7 +75,12 @@ module.exports = (App) => {
   router.get("/user/Search", Search.getSearch);
   router.get("/user/SearchProduct", Search.getSearchProduct);
 
-  router.post("user/stock", Stock.Stock);
+  router.post("/user/stock", Stock.Stock);
+
+  router.post("/user/offer", Offer.Offer);
+  router.get("/user/offer", Offer.offerGet);
+  router.put("/user/offer", Offer.updateOffer)
+  router.delete("/user/offer", Offer.OfferDelete);
 
 
   const log = (req, res, next) => {
