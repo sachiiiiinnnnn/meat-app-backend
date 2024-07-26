@@ -7,15 +7,13 @@ const ProductModal = function (req) {};
 const baseUrl = "http://192.168.1.12:8080/uploads/products"; // Update this with your server address
 
 ProductModal.product = (input, output) => {
-  const { productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity } = input;
-  console.log(input);
-  const status = productStatus ? 1 : 0;
-  const insertProduct = `INSERT INTO productDetails (productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const { productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity, bestSeller } = input;
+  const insertProduct = `INSERT INTO productDetails (productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity, bestSeller) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  pool.query(insertProduct, [productName, productDescription, mass, pieces, price, categoryName, image, status,  quantity], (err, result) => {
+  pool.query(insertProduct, [productName, productDescription, mass, pieces, price, categoryName, image, productStatus,  quantity, bestSeller], (err, result) => {
     if (err) output({ error: { description: err.message } }, null);
     else {
-      output(null, { message: "Product details inserted successfully" });
+      output(null, { message: "Product details inserted successfully", result });
     }
   });
 };
@@ -72,10 +70,10 @@ ProductModal.getProductByCategory = (categoryName, callback) => {
 };
 
 ProductModal.updateProduct = (input, output) => {
-  const { productId, productName, productDescription, gram, pieces, price, stocks, categoryName, image, productStatus } = input;
-  const status = productStatus ? 1 : 0;
+  const { productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity, bestSeller, productId } = input;
 
-  const updateProduct = `UPDATE productDetails SET productName = ?, productDescription = ?, gram = ?, pieces = ?, price = ?, stocks = ?, categoryName = ?, image = ?, productStatus = ? WHERE productId = ?`;
+
+  const updateProduct = `UPDATE productDetails SET productName = ?, productDescription = ?, mass = ?, pieces = ?, price = ?, categoryName = ?, image = ?, productStatus = ?,quantity = ?, bestSeller = ? WHERE productId = ?`;
 
   // First, get the current image to delete the old one
   ProductModal.getProductById(productId, (err, product) => {
@@ -84,7 +82,7 @@ ProductModal.updateProduct = (input, output) => {
     } else {
       const oldImage = product.image;
 
-      pool.query(updateProduct, [productName, productDescription, gram, pieces, price, stocks, categoryName, image, status, productId], (err, result) => {
+      pool.query(updateProduct, [productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity, bestSeller, productId], (err, result) => {
         if (err) {
           output({ error: { description: err.message } }, null);
         } else {
