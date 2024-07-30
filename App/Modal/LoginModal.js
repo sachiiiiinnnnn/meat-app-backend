@@ -131,4 +131,24 @@ LoginModal.updateOtp = (input, output) => {
   });
 };
 
+
+LoginModal.updateLogin= (input,output) => {
+
+  const { customerId,customerName,customerEmail } = input;
+
+  const updateName = `
+    UPDATE customerdetails
+    SET customerName = ?, customerEmail = ? 
+    WHERE customerId = ?;
+  `;
+  
+  pool.query(updateName, [customerName, customerEmail, customerId], (err, res) => {
+    if (err) {
+      return output(err, null);
+    } else {
+      return output(null, { message: "Customer details updated successfully", data: res });
+    }
+  });
+},
+
 module.exports = LoginModal;

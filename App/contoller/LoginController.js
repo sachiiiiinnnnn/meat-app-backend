@@ -55,6 +55,25 @@ exports.getCustomerId = (req, res) => {
 };
  
 
+exports.updateLogin = (req, res) => {
+  const { customerId, customerName, customerEmail } = req.body;
+
+
+  try {
+    if (!customerId || !customerName || !customerEmail ) {
+      res.status(400).send({ message: "Check data" });
+    } else {
+      LoginModal.updateLogin({ customerId, customerName, customerEmail }, (err, data) => {
+        if (err) res.status(400).send(err.error);
+        else res.send(data);
+      });
+    }
+  } catch (e) {
+    throw e;
+  }
+};
+
+
 exports.generateOtp = (req, res) => {
 
   const { customerMobile } = req.body;

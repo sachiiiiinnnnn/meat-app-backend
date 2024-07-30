@@ -48,7 +48,8 @@ module.exports = (App) => {
   router.post("/user/Login", Login.Login); 
   router.get("/user/Login", Login.getLogin);
   router.get("/user/Login/CustomerId", Login.getCustomerId);
-   router.post("/user/Login/Otp", Login.generateOtp); 
+  router.post("/user/Login/Otp", Login.generateOtp); 
+  router.put("/user/Login/Edit", Login.updateLogin); 
 
   
   router.post("/user/Category", uploadCategory.single('image'), Category.Category);
@@ -63,6 +64,7 @@ module.exports = (App) => {
   router.get('/user/Product/CategoryName', Product.getProductByCategory);
   router.put('/user/Product', uploadProduct.single('image'), Product.updateProduct);
   router.delete('/user/Product', Product.deleteProduct);
+  router.get('/user/Product/BestSeller', Product.getBestSeller);
 
   
   router.post("/user/Location", Location.Location);
@@ -76,7 +78,11 @@ module.exports = (App) => {
   router.get("/user/SearchProduct", Search.getSearchProduct);
 
   router.post("/user/stock", Stock.Stock);
+  router.get("/user/stock", Stock.getStock);
+  router.put("/user/stock", Stock.updateStock);
+  router.delete("/user/stock", Stock.deleteStock);
 
+  
   router.post("/user/offer", Offer.Offer);
   router.get("/user/offer", Offer.offerGet);
   router.put("/user/offer", Offer.updateOffer)

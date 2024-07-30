@@ -3,13 +3,12 @@ const bodyParser = require('body-parser');
 const cors = require("cors");
 const path = require('path');
 const app = express();
-require('dotenv').config()
+// require('dotenv').config()
 
 app.use(cors({
   origin: "*",
 }));
 
-console.log(process.env.password);
 const accountSid = "AC6a1a806b938876c709122933f1e4ccc9";
 
 const authToken = " 43c056dbc7bc636e495555d858a3f837";

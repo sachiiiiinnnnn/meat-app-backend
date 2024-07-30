@@ -4,7 +4,7 @@ const pool = require("../Configuration/Config");
 
 const ProductModal = function (req) {};
 
-const baseUrl = "http://192.168.1.8:8080/uploads/products"; // Update this with your server address
+const baseUrl = "http://192.168.1.22:8080/uploads/products"; // Update this with your server address
 
 ProductModal.product = (input, output) => {
   const { productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity, bestSeller } = input;
@@ -35,6 +35,26 @@ ProductModal.getProduct = (callback) => {
     }
   });
 };
+
+
+ProductModal.getbestSeller = (callback) => {
+  const getBestSeller = `SELECT * FROM productDetails WHERE bestSeller = 1`;
+
+  pool.query(getBestSeller, (err, result) => {
+    if (err) callback({ error: { description: err.message } }, null);
+    else {
+      // Prepend the base URL to each image path
+      const productsWithImageUrls = result.map(product => {
+        return {  
+          ...product,
+          image: `${baseUrl}/${product.image}`
+        };
+      });
+      callback(null, productsWithImageUrls);
+    }
+  });
+};
+
 
 ProductModal.getProductById = (productId, callback) => {
   const query = 'SELECT * FROM productDetails WHERE productId = ?';

@@ -32,6 +32,17 @@ exports.getProduct = (req, res) => {
   }
 };
 
+exports.getBestSeller = (req, res) => {
+  try {
+    ProductModal.getbestSeller((err, data) => {
+      if (err) res.status(400).send(err.error);
+      else res.send(data);
+    });
+  } catch (e) {
+    throw e;
+  }
+};
+
 exports.getProductById = (req, res) => {
   const productId = req.body.productId;
   try {
