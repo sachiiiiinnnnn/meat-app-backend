@@ -1,5 +1,8 @@
 const pool = require("../Configuration/Config");
 const ProductModal = require("./ProductModal");
+const StockModal = require("./StockModal");
+const { format } = require('date-fns');
+
 
 const BookingModal = function (req) {};
 
@@ -7,35 +10,50 @@ BookingModal.booking = (input, output) => {
     const bookings = Array.isArray(input) ? input : [input]; // Ensure bookings is an array
 
     const processBooking = (booking, callback) => {
-        const { productId, customerId, locationId, productName, quantity, amount, categoryId, paymentMode, bookingStatus } = booking;
-        const bookingDate = new Date().toISOString().split('T')[0]; // Automatically generate current date in 'YYYY-MM-DD' format
-        const bookingTime = new Date().toISOString().split('T')[1].split('.')[0]; // Automatically generate current time in 'HH:MM:SS' format
-
-        // Fetch current product details to check stock
-        ProductModal.getProductById(productId, (productErr, productData) => {
+        const { productId, customerId, locationId, productName, quantity, amount, categoryId, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus } = booking;
+      console.log(booking);
+        const FormattedBookingDate = bookingDate.split("-").reverse().join("-");
+    
+        function formatTime(time) {
+            const [timeStr, modifier] = time.split(/(AM|PM)/i);
+            let [hours, minutes] = timeStr.split(':');
+            if (modifier.toUpperCase() === 'PM' && hours !== '12') {
+                hours = parseInt(hours, 10) + 12;
+            } else if (modifier.toUpperCase() === 'AM' && hours === '12') {
+                hours = '00';
+            }
+            return `${hours.padStart(2, '0')}:${(minutes || '00').padStart(2, '0')}:00`;
+        }
+        
+        const startTime = bookingStartTime.split('-')[0];
+        const FormattedBookingStart = formatTime(startTime);
+        
+        const endTime = bookingEndTime.split('-')[0];
+        const FormattedBookingEnd = formatTime(endTime);
+    
+            StockModal.getStockById(productId, FormattedBookingDate, (productErr, stockDetails) => {
             if (productErr) {
-                callback({ error: { description: productErr.message } });
-            } else if (!productData) {
+                callback({ error: { description: "Product not found" } });
+            } else if (!stockDetails) {
                 callback({ error: { description: "Product not found" } });
             } else {
-                if (productData.stocks === 0) {
+                const stockDateOld = new Date(stockDetails.stockDate);
+                const StockDateFormet = format(stockDateOld, 'dd-MM-yyyy');
+                const StockDate = format(stockDateOld, 'yyyy-MM-dd');
+                if (stockDetails.stock === 0) {
                     callback({ error: { description: "Out of Stock" } });
-                } else if (productData.stocks < quantity) {
-                    callback({ error: { description: `Only ${productData.stocks} items available in stock` } });
+                } else if (stockDetails.stock < quantity && bookingDate === StockDateFormet) {
+                    callback({ error: { description: `Only ${stockDetails.stock} items available in stock` } });
                 } else {
-                    // Proceed with booking if enough stock is available
-                    const insertBooking = `INSERT INTO bookingDetails (productId, customerId, locationId, productName, quantity, amount, paymentMode, bookingDate, bookingTime, bookingStatus, categoryId) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-                    const values = [productId, customerId, locationId, productName, quantity, amount, paymentMode, bookingDate, bookingTime, bookingStatus, categoryId];
-
+                    const insertBooking = `INSERT INTO bookingDetails (productId, customerId, locationId, productName, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus, categoryId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    const values = [productId, customerId, locationId, productName, quantity, amount, paymentMode, FormattedBookingDate, FormattedBookingStart,FormattedBookingEnd , bookingStatus, categoryId];
+    
                     pool.query(insertBooking, values, (err, result) => {
                         if (err) {
                             callback({ error: { description: err.message } });
                         } else {
-                            // Calculate updated stock
-                            const updatedStocks = productData.stocks - quantity;
-
-                            // Update product stock in productDetails table
-                            ProductModal.updateProductStock(productId, updatedStocks, (updateErr, updateData) => {
+                            const updatedStocks = stockDetails.stock - quantity;                         
+                            StockModal.UpdatesProductStock(productId, StockDate, updatedStocks, (updateErr, updateData) => {
                                 if (updateErr) {
                                     callback({ error: { description: updateErr.message } });
                                 } else {
@@ -48,7 +66,6 @@ BookingModal.booking = (input, output) => {
             }
         });
     };
-
     const bookingPromises = bookings.map((booking) => {
         return new Promise((resolve, reject) => {
             processBooking(booking, (err, data) => {
