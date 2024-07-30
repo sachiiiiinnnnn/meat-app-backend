@@ -3,7 +3,7 @@ const mysql = require("mysql2");
 const pool = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "678905k7",
+  password: "root",
   database: "meals",
   port: 3306,
   multipleStatements: true,
@@ -42,7 +42,7 @@ pool.connect(function (err) {
     image VARCHAR(250) NOT NULL,
     productStatus BOOLEAN NOT NULL,
     quantity INT NOT NULL,
-    quantity BOOLEAN NOT NULL,
+    bestSeller BOOLEAN NOT NULL,
     FOREIGN KEY (categoryName) REFERENCES categoryDetails(categoryName)
 )`;
 
@@ -63,7 +63,8 @@ pool.connect(function (err) {
     amount INT NOT NULL,
     paymentMode VARCHAR(250) NOT NULL,
     bookingDate DATE NOT NULL,
-    bookingTime TIME NOT NULL,  
+    bookingStartTime TIME NOT NULL,  
+    bookingEndTime TIME NOT NULL,  
     FOREIGN KEY (productId) REFERENCES productDetails(productId),
     FOREIGN KEY (customerId) REFERENCES customerDetails(customerId),
     FOREIGN KEY (locationId) REFERENCES locationDetails(locationId),
@@ -79,13 +80,13 @@ pool.connect(function (err) {
 );`;
 
     const createstockdetail = `CREATE TABLE IF NOT EXISTS stockdetails (
-stockId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
-stock INT NOT NULL, 
-stockdate DATE NOT NULL, 
-categoryId INT NOT NULL,
-productId INT NOT NULL, 
-FOREIGN KEY (categoryId) REFERENCES categoryDetails(categoryId),
-FOREIGN KEY (productId) REFERENCES productDetails(productId)
+  stockId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+  stock INT NOT NULL, 
+  stockdate DATE NOT NULL, 
+  categoryId INT NOT NULL,
+  productId INT NOT NULL, 
+  FOREIGN KEY (categoryId) REFERENCES categoryDetails(categoryId),
+  FOREIGN KEY (productId) REFERENCES productDetails(productId)
 );`;
 
     const createofferdetail = `CREATE TABLE IF NOT EXISTS offerdetails (
@@ -143,9 +144,9 @@ FOREIGN KEY (productId) REFERENCES productDetails(productId)
     });
 
     pool.query(createofferdetail, function (err, result, fields) {
-      if(err) console.log(err.message);
+      if (err) console.log(err.message);
       else console.log("Offerdetail table create successfully");
-    })
+    });
   } catch (e) {
     console.log(e.message);
   }

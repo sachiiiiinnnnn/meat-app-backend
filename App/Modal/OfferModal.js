@@ -16,7 +16,6 @@ OfferModal.offer = (input, output) => {
     customerType,
     customerId,
   } = input;
-  console.log(input);
 
   const insertOffer = `INSERT INTO offerdetails (offerCode, offerType, categoryId, productId, offerPercentage, maxDiscount, usageLimit, fromDate, endDate, customerType, customerId) VALUES (?,?,?,?,?,?,?,?,?,?,?)`;
   pool.query(

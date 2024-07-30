@@ -7,7 +7,8 @@ exports.Booking = (req, res) => {
     const invalidBooking = bookings.some(booking =>
         !booking.productId || !booking.customerId || !booking.productName ||
         !booking.quantity || !booking.amount || !booking.locationId || 
-        !booking.categoryId || !booking.paymentMode || !booking.bookingStatus
+        !booking.categoryId || !booking.paymentMode || !booking.bookingStatus ||
+        !booking.bookingStartTime || !booking.bookingEndTime || !booking.bookingDate
     ); 
 
     if (invalidBooking) {
