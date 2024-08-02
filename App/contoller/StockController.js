@@ -2,12 +2,11 @@ const StockModal = require("../Modal/StockModal");
 
 exports.Stock = (req, res) => {
   const { stock, stockDate, categoryId, productId } = req.body;
-  const formattedStockDate = stockDate.split("-").reverse().join("-");
   try {
     if (!stock || !stockDate || !categoryId || !productId) {
       res.status(400).send({ message: "Check Data" });
     } else {
-        const stockData = { stock, stockDate: formattedStockDate, categoryId, productId };
+        const stockData = { stock, stockDate, categoryId, productId };
         StockModal.Stock(stockData, (err, data) => {
         if (err) res.status(400).send(err.error);
         else res.send(data);

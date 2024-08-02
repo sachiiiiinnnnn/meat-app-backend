@@ -11,49 +11,28 @@ BookingModal.booking = (input, output) => {
 
     const processBooking = (booking, callback) => {
         const { productId, customerId, locationId, productName, quantity, amount, categoryId, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus } = booking;
-      console.log(booking);
-        const FormattedBookingDate = bookingDate.split("-").reverse().join("-");
-    
-        function formatTime(time) {
-            const [timeStr, modifier] = time.split(/(AM|PM)/i);
-            let [hours, minutes] = timeStr.split(':');
-            if (modifier.toUpperCase() === 'PM' && hours !== '12') {
-                hours = parseInt(hours, 10) + 12;
-            } else if (modifier.toUpperCase() === 'AM' && hours === '12') {
-                hours = '00';
-            }
-            return `${hours.padStart(2, '0')}:${(minutes || '00').padStart(2, '0')}:00`;
-        }
-        
-        const startTime = bookingStartTime.split('-')[0];
-        const FormattedBookingStart = formatTime(startTime);
-        
-        const endTime = bookingEndTime.split('-')[0];
-        const FormattedBookingEnd = formatTime(endTime);
-    
-            StockModal.getStockById(productId, FormattedBookingDate, (productErr, stockDetails) => {
+
+            StockModal.getStockById(productId, bookingDate, categoryId, (productErr, stockDetails) => {
             if (productErr) {
                 callback({ error: { description: "Product not found" } });
             } else if (!stockDetails) {
                 callback({ error: { description: "Product not found" } });
             } else {
-                const stockDateOld = new Date(stockDetails.stockDate);
-                const StockDateFormet = format(stockDateOld, 'dd-MM-yyyy');
-                const StockDate = format(stockDateOld, 'yyyy-MM-dd');
+                const stockDate = stockDetails.stockDate;
                 if (stockDetails.stock === 0) {
                     callback({ error: { description: "Out of Stock" } });
-                } else if (stockDetails.stock < quantity && bookingDate === StockDateFormet) {
+                } else if (stockDetails.stock < quantity && bookingDate === stockDate) {
                     callback({ error: { description: `Only ${stockDetails.stock} items available in stock` } });
                 } else {
                     const insertBooking = `INSERT INTO bookingDetails (productId, customerId, locationId, productName, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus, categoryId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-                    const values = [productId, customerId, locationId, productName, quantity, amount, paymentMode, FormattedBookingDate, FormattedBookingStart,FormattedBookingEnd , bookingStatus, categoryId];
+                    const values = [productId, customerId, locationId, productName, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime , bookingStatus, categoryId];
     
                     pool.query(insertBooking, values, (err, result) => {
                         if (err) {
                             callback({ error: { description: err.message } });
                         } else {
                             const updatedStocks = stockDetails.stock - quantity;                         
-                            StockModal.UpdatesProductStock(productId, StockDate, updatedStocks, (updateErr, updateData) => {
+                            StockModal.UpdatesProductStock(productId, stockDate, updatedStocks, (updateErr, updateData) => {
                                 if (updateErr) {
                                     callback({ error: { description: updateErr.message } });
                                 } else {
@@ -90,5 +69,45 @@ BookingModal.getBooking = (customerId, bookingDate, bookingTime, output) => {
         }
     });
 };
+
+BookingModal.updateBooking = (input, output) => {
+        const {bookingId, productId, quantity, bookingDate, categoryId, bookingStatus} = input;
+
+        if(bookingStatus === "cancel") {
+            const updateBooking = `UPDATE bookingDetails SET bookingStatus = ? WHERE bookingId = ?`;
+            pool.query(updateBooking ,[bookingStatus, bookingId], (err, result) => {
+                if(err) {
+                    output({error : {description: err.message}}, null);
+                } else {
+                    const getBooking = `SELECT * FROM bookingDetails WHERE bookingId = ?`;
+                    pool.query(getBooking,[bookingId], (err, data) => {
+                        if(err) output({error : {description: err.message}}, null);
+                        else output(null, data);
+                    })
+                    StockModal.getStockByDateProCat( productId, bookingDate, categoryId, (err, data) => {
+                        if(err) {
+                            output(err, null);
+                        } else {
+                            const stockVale = {
+                                stockId: data[0].stockId,
+                                stock: quantity + data[0].stock
+                            }
+                            StockModal.updateStock(stockVale, (err, data) => {
+                                if(err) {
+                                    output(err, null);
+                                } else {
+                                    output(null, data);
+                                }
+                            })
+                        }
+                    })
+                }
+            })
+        } else {
+            output({ error: { description: "Booking is already cancelled" } }, null);
+        }
+
+        
+}
 
 module.exports = BookingModal;
