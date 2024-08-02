@@ -1,3 +1,4 @@
+const { response } = require("express");
 const LoginModal = require("../Modal/LoginModal");
 
 exports.Login = (req, res) => {
@@ -16,7 +17,9 @@ exports.Login = (req, res) => {
         // OTP is valid, now update user details
         LoginModal.updateUserDetails(req.body, (err, updateResult) => {
           if (err) return res.status(400).send(err.error);
+          
           res.send(updateResult);
+         
         });
       } else {
         // OTP is invalid
@@ -55,23 +58,7 @@ exports.getCustomerId = (req, res) => {
 };
  
 
-exports.updateLogin = (req, res) => {
-  const { customerId, customerName, customerEmail } = req.body;
 
-
-  try {
-    if (!customerId || !customerName || !customerEmail ) {
-      res.status(400).send({ message: "Check data" });
-    } else {
-      LoginModal.updateLogin({ customerId, customerName, customerEmail }, (err, data) => {
-        if (err) res.status(400).send(err.error);
-        else res.send(data);
-      });
-    }
-  } catch (e) {
-    throw e;
-  }
-};
 
 
 exports.generateOtp = (req, res) => {
@@ -115,3 +102,19 @@ exports.generateOtp = (req, res) => {
 };
 
 
+exports.updateLogin = (req, res) => {
+  const { customerId, customerName, customerEmail } = req.body;
+
+  try {
+    if (!customerId || !customerName || !customerEmail) {
+      res.status(400).send({ message: "Check data" });
+    } else {
+      LoginModal.updateLogin({ customerId, customerName, customerEmail }, (err, data) => {
+        if (err) res.status(400).send(err.error);
+        else res.send(data);
+      });
+    }
+  } catch (e) {
+    res.status(500).send({ message: "Internal Server Error", error: e.message });
+  }
+};

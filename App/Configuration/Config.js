@@ -3,7 +3,7 @@ const mysql = require("mysql2");
 const pool = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "root",
+  password: "678905k7",
   database: "meals",
   port: 3306,
   multipleStatements: true,
@@ -30,21 +30,21 @@ pool.connect(function (err) {
       image VARCHAR(250) NOT NULL,
       PRIMARY KEY (categoryId)
     )`;
-
+    
     const createProductDetails = `CREATE  TABLE IF NOT EXISTS  productDetails (
-    productId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    productName VARCHAR(250) NOT NULL,
-    productDescription VARCHAR(250) NOT NULL,
-    mass VARCHAR(250) NOT NULL,
-    pieces INT NOT NULL,
-    price INT NOT NULL,
-    categoryName VARCHAR(250) NOT NULL,
-    image VARCHAR(250) NOT NULL,
-    productStatus BOOLEAN NOT NULL,
-    quantity INT NOT NULL,
-    bestSeller BOOLEAN NOT NULL,
-    FOREIGN KEY (categoryName) REFERENCES categoryDetails(categoryName)
-)`;
+      productId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+      productName VARCHAR(250) NOT NULL,
+      productDescription VARCHAR(250) NOT NULL,
+      mass VARCHAR(250) NOT NULL,
+      pieces INT NOT NULL,
+      price INT NOT NULL,
+      categoryId INT NOT NULL,
+      image VARCHAR(250) NOT NULL,
+      productStatus BOOLEAN NOT NULL,
+      quantity INT NOT NULL,
+      bestSeller BOOLEAN NOT NULL,
+      FOREIGN KEY (categoryId) REFERENCES categoryDetails(categoryId)
+  )`;
 
     const createLocationDetails = `CREATE  TABLE IF NOT EXISTS   locationDetails (
     locationId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -68,7 +68,7 @@ pool.connect(function (err) {
     FOREIGN KEY (productId) REFERENCES productDetails(productId),
     FOREIGN KEY (customerId) REFERENCES customerDetails(customerId),
     FOREIGN KEY (locationId) REFERENCES locationDetails(locationId),
-    FOREIGN KEY (categoryId) REFERENCES locationDetails(categoryId)
+    FOREIGN KEY (categoryId) REFERENCES categoryDetails(categoryId)
 );`;
 
     const otp = `CREATE  TABLE IF NOT EXISTS otp(

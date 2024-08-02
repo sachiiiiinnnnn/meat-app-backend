@@ -119,36 +119,44 @@ LoginModal.updateOtp = (input, output) => {
 
   pool.query(updateOtp, [otp, customerId], (err, result) => {
     if (err) return output({ error: { description: err.message } }, null);
-    client.messages
-      .create({
-        body: `Dear Customer, this is your OTP ${otp} `,
-        from: "+19123015569",
-        to: "+918220877296",
-      })
-      .then((message) => console.log(message.sid))
-      .catch((error) => console.error("Error sending message:", error));
+    // client.messages
+    //   .create({
+    //     body: `Dear Customer, this is your OTP ${otp} `,
+    //     from: "+19123015569",
+    //     to: "+918220877296",
+    //   })
+    //   .then((message) => console.log(message.sid))
+    //   .catch((error) => console.error("Error sending message:", error));
     output(null, { message: "OTP updated successfully" });
   });
 };
 
 
-LoginModal.updateLogin= (input,output) => {
-
-  const { customerId,customerName,customerEmail } = input;
+LoginModal.updateLogin = (input, output) => {
+  const { customerId, customerName, customerEmail } = input;
 
   const updateName = `
     UPDATE customerdetails
     SET customerName = ?, customerEmail = ? 
     WHERE customerId = ?;
   `;
-  
-  pool.query(updateName, [customerName, customerEmail, customerId], (err, res) => {
+
+  pool.query(updateName, [customerName, customerEmail, customerId], (err, result) => {
     if (err) {
       return output(err, null);
     } else {
-      return output(null, { message: "Customer details updated successfully", data: res });
+      const getUser = `SELECT customerId, customerName, customerEmail, customerMobile FROM customerdetails WHERE customerId = ?`;
+
+      pool.query(getUser, [customerId], (err, userResult) => {
+        if (err) {
+          return output(err, null);
+        } else {
+          return output(null, { result: userResult });
+        }
+      });
     }
   });
-},
+};
+
 
 module.exports = LoginModal;
