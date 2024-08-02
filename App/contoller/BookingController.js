@@ -10,7 +10,7 @@ exports.Booking = (req, res) => {
         !booking.categoryId || !booking.paymentMode || !booking.bookingStatus ||
         !booking.bookingStartTime || !booking.bookingEndTime || !booking.bookingDate
     ); 
-
+    try {
     if (invalidBooking) {
         res.status(400).send({ message: "Check data" });
     } else {
@@ -18,6 +18,9 @@ exports.Booking = (req, res) => {
             if (err) res.status(400).send(err.error);
             else res.send(data);
         });
+    }
+    } catch (e) {
+        throw e;
     }
 };
 
@@ -42,3 +45,20 @@ exports.getBooking = (req, res) => {
         res.status(500).send({ message: "Server error" });
     }
 };
+
+exports.updateBooking = (req, res) => {
+    try {
+        const {bookingId, productId, quantity, bookingDate, categoryId, bookingStatus} = req.body;
+        if(!bookingId || !productId || !quantity || !bookingDate || !categoryId || !bookingStatus) {
+            res.status(400).send({ message: "Check data" });
+        } else {
+            BookingModal.updateBooking (req.body, (err, data) => {
+                if(err) res.status(400).send(err.error);
+                else res.send(data);
+            });
+        }
+
+    } catch(e) {
+        throw(e);
+    }
+}

@@ -73,6 +73,7 @@ module.exports = (App) => {
 
   router.post("/user/Booking", Booking.Booking);
   router.get("/user/Booking", Booking.getBooking);
+  router.put("/user/Booking", Booking.updateBooking)
 
   router.get("/user/Search", Search.getSearch);
   router.get("/user/SearchProduct", Search.getSearchProduct);
