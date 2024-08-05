@@ -5,10 +5,10 @@ exports.Booking = (req, res) => {
     const bookings = Array.isArray(req.body) ? req.body : [req.body]; // Ensure bookings is an array
 
     const invalidBooking = bookings.some(booking =>
-        !booking.productId || !booking.customerId || !booking.productName ||
-        !booking.quantity || !booking.amount || !booking.locationId || 
-        !booking.categoryId || !booking.paymentMode || !booking.bookingStatus ||
-        !booking.bookingStartTime || !booking.bookingEndTime || !booking.bookingDate
+        !booking.productId || !booking.customerId || !booking.quantity ||
+        !booking.amount || !booking.locationId || !booking.categoryId || 
+        !booking.paymentMode || !booking.bookingStatus || !booking.bookingStartTime || 
+        !booking.bookingEndTime || !booking.bookingDate
     ); 
     try {
     if (invalidBooking) {

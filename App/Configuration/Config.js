@@ -58,7 +58,6 @@ pool.connect(function (err) {
     productId INT NOT NULL,
     customerId INT NOT NULL,
     locationId INT NOT NULL,
-    productName VARCHAR(250) NOT NULL,
     quantity INT NOT NULL,
     amount INT NOT NULL,
     paymentMode VARCHAR(250) NOT NULL,

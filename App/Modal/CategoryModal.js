@@ -83,7 +83,14 @@ CategoryModal.updateCategory = (input, output) => {
               }
             });
           }
-          output(null, { message: "Category details updated successfully" });
+          const getCategory = `SELECT * FROM categorydetails WHERE categoryId = ?`;
+          pool.query(getCategory,[categoryId], (err, data) => {
+            if(err) {
+              output({error: {description: err.message}}, null)
+            } else {
+              output(null, { message: "Category details updated successfully", data});
+            }
+          })
         }
       });
     }

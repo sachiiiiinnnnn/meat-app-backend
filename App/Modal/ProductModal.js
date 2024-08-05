@@ -7,10 +7,10 @@ const ProductModal = function (req) {};
 const baseUrl = "http://192.168.1.22:8080/uploads/products"; // Update this with your server address
 
 ProductModal.product = (input, output) => {
-  const { productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity, bestSeller } = input;
-  const insertProduct = `INSERT INTO productDetails (productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity, bestSeller) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const { productName, productDescription, mass, pieces, price, categoryId, image, productStatus, quantity, bestSeller } = input;
+  const insertProduct = `INSERT INTO productDetails (productName, productDescription, mass, pieces, price, categoryId, image, productStatus, quantity, bestSeller) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-  pool.query(insertProduct, [productName, productDescription, mass, pieces, price, categoryName, image, productStatus,  quantity, bestSeller], (err, result) => {
+  pool.query(insertProduct, [productName, productDescription, mass, pieces, price, categoryId, image, productStatus,  quantity, bestSeller], (err, result) => {
     if (err) output({ error: { description: err.message } }, null);
     else {
       output(null, { message: "Product details inserted successfully", result });
@@ -73,9 +73,9 @@ ProductModal.getProductById = (productId, callback) => {
   });
 };
 
-ProductModal.getProductByCategory = (categoryName, callback) => {
-  const query = 'SELECT * FROM productDetails WHERE categoryName = ? AND productStatus =1';
-  pool.query(query, [categoryName], (err, results) => {
+ProductModal.getProductByCategory = (categoryId, callback) => {
+  const query = 'SELECT * FROM productDetails WHERE categoryId = ? AND productStatus =1';
+  pool.query(query, [categoryId], (err, results) => {
     if (err) {
       callback({ error: { description: err.message } }, null);
     } else {
@@ -90,10 +90,10 @@ ProductModal.getProductByCategory = (categoryName, callback) => {
 };
 
 ProductModal.updateProduct = (input, output) => {
-  const { productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity, bestSeller, productId } = input;
+  const { productName, productDescription, mass, pieces, price, categoryId, image, productStatus, quantity, bestSeller, productId } = input;
 
 
-  const updateProduct = `UPDATE productDetails SET productName = ?, productDescription = ?, mass = ?, pieces = ?, price = ?, categoryName = ?, image = ?, productStatus = ?,quantity = ?, bestSeller = ? WHERE productId = ?`;
+  const updateProduct = `UPDATE productDetails SET productName = ?, productDescription = ?, mass = ?, pieces = ?, price = ?, categoryId = ?, image = ?, productStatus = ?,quantity = ?, bestSeller = ? WHERE productId = ?`;
 
   // First, get the current image to delete the old one
   ProductModal.getProductById(productId, (err, product) => {
@@ -102,7 +102,7 @@ ProductModal.updateProduct = (input, output) => {
     } else {
       const oldImage = product.image;
 
-      pool.query(updateProduct, [productName, productDescription, mass, pieces, price, categoryName, image, productStatus, quantity, bestSeller, productId], (err, result) => {
+      pool.query(updateProduct, [productName, productDescription, mass, pieces, price, categoryId, image, productStatus, quantity, bestSeller, productId], (err, result) => {
         if (err) {
           output({ error: { description: err.message } }, null);
         } else {
@@ -114,7 +114,14 @@ ProductModal.updateProduct = (input, output) => {
               }
             });
           }
-          output(null, { message: "Product details updated successfully" });
+          const getProduct = `SELECT * FROM productDetails WHERE productId = ?`
+          pool.query(getProduct, [productId], (err, data) => {
+            if(err){
+              output({ error: { description: err.message } }, null);
+            } else {
+              output(null, { message: "Product details updated successfully", data});
+            }
+          })
         }
       });
     }

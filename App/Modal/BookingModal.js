@@ -10,7 +10,7 @@ BookingModal.booking = (input, output) => {
     const bookings = Array.isArray(input) ? input : [input]; // Ensure bookings is an array
 
     const processBooking = (booking, callback) => {
-        const { productId, customerId, locationId, productName, quantity, amount, categoryId, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus } = booking;
+        const { productId, customerId, locationId, quantity, amount, categoryId, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus } = booking;
 
             StockModal.getStockById(productId, bookingDate, categoryId, (productErr, stockDetails) => {
             if (productErr) {
@@ -24,8 +24,8 @@ BookingModal.booking = (input, output) => {
                 } else if (stockDetails.stock < quantity && bookingDate === stockDate) {
                     callback({ error: { description: `Only ${stockDetails.stock} items available in stock` } });
                 } else {
-                    const insertBooking = `INSERT INTO bookingDetails (productId, customerId, locationId, productName, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus, categoryId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-                    const values = [productId, customerId, locationId, productName, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime , bookingStatus, categoryId];
+                    const insertBooking = `INSERT INTO bookingDetails (productId, customerId, locationId, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus, categoryId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    const values = [productId, customerId, locationId, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime , bookingStatus, categoryId];
     
                     pool.query(insertBooking, values, (err, result) => {
                         if (err) {
