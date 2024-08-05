@@ -48,8 +48,6 @@ exports.updateCategory = (req, res) => {
   }
 };
 
-
-
 exports.getCategoryById = (req, res) => {
   const categoryId = req.body.categoryId; // Use query parameter for customerId
 
