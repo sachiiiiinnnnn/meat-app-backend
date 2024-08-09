@@ -22,19 +22,21 @@ exports.Location = (req, res) => {
 
 
 exports.getLocation = (req, res) => {
-  try {
-    LocationModal. getLocation(req, (err, data) => {
-      if (err) res.status(400).send(err.error);
-      else res.send(data);
-    });
-    
-  
-  } catch (e) {
-    throw e;
+  const customerId = req.query.customerId;
+
+  if (!customerId) {
+    return res.status(400).send({ error: 'Customer ID is required' });
   }
 
-  
+  LocationModal.getLocation(customerId, (err, data) => {
+    if (err) {
+      console.error('Error fetching location:', err);
+      return res.status(500).send({ error: 'An error occurred while fetching location' });
+    }
+    res.send(data);
+  });
 };
+
 
 exports.deleteLocation = (req, res) => {
     const { locationId } = req.body;

@@ -3,7 +3,7 @@ const mysql = require("mysql2");
 const pool = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "root",
+  password: "678905k7",
   database: "meals",
   port: 3306,
   multipleStatements: true,
@@ -35,7 +35,7 @@ pool.connect(function (err) {
       productId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
       productName VARCHAR(250) NOT NULL,
       productDescription VARCHAR(250) NOT NULL,
-      mass VARCHAR(250) NOT NULL,
+      mass VARCHAR(250) NULL,
       pieces INT NOT NULL,
       price INT NOT NULL,
       categoryId INT NOT NULL,
@@ -56,6 +56,7 @@ pool.connect(function (err) {
     const createBookingDetails = `CREATE  TABLE IF NOT EXISTS  bookingDetails (
     bookingId INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     productId INT NOT NULL,
+    categoryId INT NOT NULL,
     customerId INT NOT NULL,
     locationId INT NOT NULL,
     quantity INT NOT NULL,
@@ -106,6 +107,16 @@ pool.connect(function (err) {
     FOREIGN KEY (categoryId) REFERENCES categoryDetails(categoryId)
     ); `;
 
+//     const createCart = `CREATE TABLE IF NOT EXISTS cart (
+//     cartId INT NOT NULL AUTO_INCREMENT,
+//     productId INT NOT NULL,
+//     customerId INT NOT NULL,
+//     count INT,
+//     PRIMARY KEY (cartId),
+//     FOREIGN KEY (customerId) REFERENCES customerdetails(customerId),
+//     FOREIGN KEY (productId) REFERENCES productdetails(productId)
+// ); `;
+
     // Execute each query separately
     pool.query(createCustomerDetails, function (err, results, fields) {
       if (err) console.log(err.message);
@@ -146,6 +157,14 @@ pool.connect(function (err) {
       if (err) console.log(err.message);
       else console.log("Offerdetail table create successfully");
     });
+
+    
+    // pool.query(createCart, function (err, result, fields) {
+    //   if (err) console.log(err.message);
+    //   else console.log("cart table create successfully");
+    // });
+
+
   } catch (e) {
     console.log(e.message);
   }

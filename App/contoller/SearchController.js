@@ -1,11 +1,11 @@
 const SearchModal = require("../Modal/SearchModal");
 
 exports.getSearch = (req, res) => {
-    const categoryName = req.query.categoryName;
+    const categoryId = req.query.categoryId;
     const productName = req.query.productName;
 
     try {
-        SearchModal.getSearch(categoryName, productName, (err, data) => {
+        SearchModal.getSearch(categoryId, productName, (err, data) => {
             if (err) res.status(400).send(err.error);
             else res.send(data);
         });

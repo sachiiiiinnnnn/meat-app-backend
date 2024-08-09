@@ -13,6 +13,8 @@ module.exports = (App) => {
   const Search = require("../contoller/SearchController");
   const Stock = require("../contoller/StockController");
   const Offer = require("../contoller/OfferController");
+  // const Cart = require("../contoller/CartController");
+
 
   
 
@@ -48,7 +50,7 @@ module.exports = (App) => {
   router.post("/user/Login", Login.Login); 
   router.get("/user/Login", Login.getLogin);
   router.get("/user/Login/CustomerId", Login.getCustomerId);
-  router.post("/user/Login/Otp", Login.generateOtp); 
+  router.post("/user/Login/Otp", Login.generateOtp);
   router.put("/user/Login/Edit", Login.updateLogin); 
 
   
@@ -61,7 +63,7 @@ module.exports = (App) => {
   router.post('/user/Product', uploadProduct.single('image'), Product.Product);
   router.get('/user/Product', Product.getProduct);
   router.get('/user/Product/Id', Product.getProductById);
-  router.get('/user/Product/CategoryName', Product.getProductByCategory);
+  router.get('/user/Product/CategoryId', Product.getProductByCategory);
   router.put('/user/Product', uploadProduct.single('image'), Product.updateProduct);
   router.delete('/user/Product', Product.deleteProduct);
   router.get('/user/Product/BestSeller', Product.getBestSeller);
@@ -73,7 +75,7 @@ module.exports = (App) => {
 
   router.post("/user/Booking", Booking.Booking);
   router.get("/user/Booking", Booking.getBooking);
-  router.put("/user/Booking", Booking.updateBooking)
+  router.put("/user/Booking", Booking.updateBooking);
 
   router.get("/user/Search", Search.getSearch);
   router.get("/user/SearchProduct", Search.getSearchProduct);
@@ -89,6 +91,10 @@ module.exports = (App) => {
   router.put("/user/offer", Offer.updateOffer)
   router.delete("/user/offer", Offer.OfferDelete);
 
+  // router.post("/user/Cart", Cart.Cart);
+  // router.get("/user/Cart", Cart.getCart);
+
+  
 
   const log = (req, res, next) => {
     const { originalUrl, method, query, body } = req;

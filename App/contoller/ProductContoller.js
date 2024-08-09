@@ -2,19 +2,37 @@ const { param } = require("express/lib/request");
 const ProductModal = require("../Modal/ProductModal");
 
 exports.Product = (req, res) => {
-  const {productName, productDescription, mass, pieces, price, categoryId, quantity} = req.body;
+  const {
+    productName,
+    productDescription,
+    pieces,
+    price,
+    categoryId,
+    quantity,
+  } = req.body;
   const image = req.file ? req.file.filename : null;
   const productStatus = req.body.productStatus === "true" ? 1 : 0;
-  const bestSeller = req.body.bestSeller  === "false" ? 0 : 1;
+  const bestSeller = req.body.bestSeller === "false" ? 0 : 1;
 
   try {
-    if (!productName || !productDescription || !mass || !pieces || !price  || !categoryId || !quantity || !image) {
+    if (
+      !productName ||
+      !productDescription ||
+      !pieces ||
+      !price ||
+      !categoryId ||
+      !quantity ||
+      !image
+    ) {
       res.status(400).send({ message: "Check data" });
     } else {
-      ProductModal.product({ ...req.body, productStatus, image, bestSeller }, (err, data) => {
-        if (err) res.status(400).send(err.error);
-        else res.send(data);
-      });
+      ProductModal.product(
+        { ...req.body, productStatus, image, bestSeller },
+        (err, data) => {
+          if (err) res.status(400).send(err.error);
+          else res.send(data);
+        }
+      );
     }
   } catch (e) {
     throw e;
@@ -51,14 +69,14 @@ exports.getProductById = (req, res) => {
       else res.send(data);
     });
   } catch (e) {
-    throw e;  
+    throw e;
   }
 };
 
 exports.getProductByCategory = (req, res) => {
-  const categoryName = req.query.categoryName;
+  const categoryId = req.query.categoryId;
   try {
-    ProductModal.getProductByCategory(categoryName, (err, data) => {
+    ProductModal.getProductByCategory(categoryId, (err, data) => {
       if (err) res.status(400).send(err.error);
       else res.send(data);
     });
@@ -68,25 +86,58 @@ exports.getProductByCategory = (req, res) => {
 };
 
 exports.updateProduct = (req, res) => {
-  const { productId, productName, productDescription, mass, pieces, price, categoryId, quantity } = req.body;
+  const {
+    productId,
+    productName,
+    productDescription,
+    mass,
+    pieces,
+    price,
+    categoryId,
+    quantity,
+  } = req.body;
   const image = req.file ? req.file.filename : null;
   const productStatus = req.body.productStatus === "true" ? 1 : 0;
-  const bestSeller = req.body.bestSeller  === "false" ? 0 : 1;
+  const bestSeller = req.body.bestSeller === "false" ? 0 : 1;
 
-  
   console.log(req.body);
   console.log(image);
   console.log(productStatus);
   console.log(bestSeller);
 
   try {
-    if (!productId || !productName || !productDescription || !mass || !pieces || !price  || !categoryId || !quantity || !image) {
+    if (
+      !productId ||
+      !productName ||
+      !productDescription ||
+      !mass ||
+      !pieces ||
+      !price ||
+      !categoryId ||
+      !quantity ||
+      !image
+    ) {
       res.status(400).send({ message: "Check data" });
     } else {
-      ProductModal.updateProduct({ productId, productName, productDescription, mass, pieces, price, quantity, categoryId, image, productStatus, bestSeller }, (err, data) => {
-        if (err) res.status(400).send(err.error);
-        else res.send(data);
-      });
+      ProductModal.updateProduct(
+        {
+          productId,
+          productName,
+          productDescription,
+          mass,
+          pieces,
+          price,
+          quantity,
+          categoryId,
+          image,
+          productStatus,
+          bestSeller,
+        },
+        (err, data) => {
+          if (err) res.status(400).send(err.error);
+          else res.send(data);
+        }
+      );
     }
   } catch (e) {
     throw e;

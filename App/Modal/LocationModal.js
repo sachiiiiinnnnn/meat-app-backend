@@ -18,17 +18,21 @@ LocationModal.location = (input, output) => {
   });
 };
 
-LocationModal.getLocation = (input, output) => {
-  const getLocation = `SELECT * FROM locationDetails`;
 
-  pool.query(getLocation, function (err, result) {
-    console.log(err);
-    if (err) output({ error: { description: err } }, null);
-    else {
-      output(null, result);
+
+LocationModal.getLocation = (customerId, callback) => {
+  const getLocationQuery = `SELECT * FROM locationDetails WHERE customerId = ?`;
+
+  pool.query(getLocationQuery, [customerId], (err, result) => {
+    if (err) {
+      console.error('Error executing query:', err);
+      callback({ error: { description: err } }, null);
+    } else {
+      callback(null, result);
     }
   });
 };
+
 
 
 
