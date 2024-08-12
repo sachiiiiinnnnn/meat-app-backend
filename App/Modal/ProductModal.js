@@ -4,7 +4,7 @@ const pool = require("../Configuration/Config");
 
 const ProductModal = function (req) {};
 
-const baseUrl = "http://192.168.1.4:8080/uploads/products"; // Update this with your server address
+const baseUrl = "http://192.168.1.12:8080/uploads/products"; // Update this with your server address
 
 ProductModal.product = (input, output) => {
   const { productName, productDescription, mass, pieces, price, categoryId, image, productStatus, quantity, bestSeller } = input;
@@ -19,7 +19,7 @@ ProductModal.product = (input, output) => {
 };
 
 ProductModal.getProduct = (callback) => {
-  const getProduct = `SELECT * FROM productDetails`;
+  const getProduct = `SELECT * FROM productDetails `;
 
   pool.query(getProduct, (err, result) => {
     if (err) callback({ error: { description: err.message } }, null);

@@ -1,5 +1,5 @@
 const pool = require("../Configuration/Config");
-
+const moment = require('moment')
 const OfferModal = function (req) {};
 
 OfferModal.offer = (input, output) => {
@@ -11,8 +11,8 @@ OfferModal.offer = (input, output) => {
     offerPercentage,
     maxDiscount,
     usageLimit,
-    formattedFromDate,
-    formattedEndDate,
+    fromDate,
+    endDate,
     customerType,
     customerId,
   } = input;
@@ -28,8 +28,8 @@ OfferModal.offer = (input, output) => {
       offerPercentage,
       maxDiscount,
       usageLimit,
-      formattedFromDate,
-      formattedEndDate,
+      fromDate,
+      endDate,
       customerType,
       customerId,
     ],
@@ -44,13 +44,23 @@ OfferModal.offer = (input, output) => {
 };
 
 OfferModal.offerGet = (callback) => {
-  const getOffer = `SELECT * FROM offerdetails`;
+  const getOffer = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
+                    FROM offerdetails 
+                    JOIN categorydetails 
+                    on categorydetails.categoryId = offerdetails.categoryId
+                    JOIN productdetails 
+                    on productdetails.productId = offerdetails.productId;`;
 
   pool.query(getOffer, (err, result) => {
     if (err) {
       callback({ error: { description: err } }, null);
     } else {
-      callback(null, result);
+      const formattedResults = result.map(row => ({
+        ...row,
+        fromDate: moment(row.fromDate).format('YYYY-MM-DD'),
+        endDate: moment(row.endDate).format('YYYY-MM-DD'),
+      }));
+      callback(null, formattedResults);
     }
   });
 };
@@ -63,11 +73,11 @@ OfferModal.OfferDelete = (offerId, output) => {
   });
 };
 
-OfferModal.OfferUpdate = (offerId, offerPercentage, maxDiscount, usageLimit, formattedFromDate, formattedEndDate, output) => {
+OfferModal.OfferUpdate = (offerId, offerPercentage, maxDiscount, usageLimit, fromDate, endDate, output) => {
 
     const updateOffer = `UPDATE offerdetails SET offerPercentage = ?, maxDiscount = ?, usageLimit = ?, fromDate = ?, endDate = ? WHERE OfferId = ?`;
 
-    pool.query(updateOffer, [offerPercentage, maxDiscount, usageLimit, formattedFromDate, formattedEndDate, offerId], (err, result) => {
+    pool.query(updateOffer, [offerPercentage, maxDiscount, usageLimit, fromDate, endDate, offerId], (err, result) => {
         if(err) output({error: {description: err}}, null);
         else output(null, {message: "Offer Updated successfully", result});
     })

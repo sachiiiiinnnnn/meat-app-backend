@@ -17,7 +17,18 @@ StockModal.Stock = (input, output) => {
 };
 
 StockModal.getStock = (callback) => {
-  const getStock = `SELECT * FROM stockdetails`;
+  const getStock = `SELECT stockdetails.stockId, 
+                    stockdetails.stock, 
+                    stockdetails.categoryId, 
+                    stockdetails.productId, 
+                    stockdetails.stockDate, 
+                    categorydetails.categoryName,
+                    productdetails.productName
+                    FROM stockdetails
+                    JOIN categorydetails
+                    ON stockdetails.categoryId = categorydetails.categoryId
+                    JOIN productdetails 
+                    ON stockdetails.productId = productdetails.productId;`;
   pool.query(getStock, (err, result) => {
     if (err) {
       callback({ error: { description: err.message } }, null);
