@@ -67,6 +67,8 @@ module.exports = (App) => {
   router.put('/user/Product', uploadProduct.single('image'), Product.updateProduct);
   router.delete('/user/Product', Product.deleteProduct);
   router.get('/user/Product/BestSeller', Product.getBestSeller);
+  router.get('/user/Product/category', Product.getProductByCategoryAll);
+  router.put('/user/Product/ProductStatus', Product.productStatus);
 
   
   router.post("/user/Location", Location.Location);
@@ -88,6 +90,7 @@ module.exports = (App) => {
   
   router.post("/user/offer", Offer.Offer);
   router.get("/user/offer", Offer.offerGet);
+  router.get("/user/offer/byOfferType", Offer.offerGetByOfferType);
   router.put("/user/offer", Offer.updateOffer)
   router.delete("/user/offer", Offer.OfferDelete);
 

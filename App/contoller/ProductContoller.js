@@ -85,6 +85,42 @@ exports.getProductByCategory = (req, res) => {
   }
 };
 
+exports.getProductByCategoryAll = (req, res) => {
+  const categoryId = req.query.categoryId;
+  try {
+    ProductModal.getProductByCategoryAll(categoryId, (err, data) => {
+      if(err) {
+        res.status(400).send(err.message);
+      } else {
+        res.send(data);
+      }
+    })
+  } catch (error) {
+    throw(error)
+  }
+}
+
+exports.productStatus = (req, res) => {
+  const productStatus = req.body.productStatus === true ? 1 : 0;
+  const productId = req.body.productId;
+
+  try {
+    if (!productId || typeof productStatus === 'undefined') {
+      return res.status(400).send({ message: "Product ID and Status are required." });
+    }
+
+    ProductModal.updateProductStatus(productId, productStatus, (err, data) => {
+      if (err) {
+        return res.status(400).send({ message: err.description });
+      }
+      res.send({ message: "Product status updated successfully" });
+    });
+  } catch (e) {
+    console.error("Error updating product status:", e);
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+};
+
 exports.updateProduct = (req, res) => {
   const {
     productId,
@@ -99,11 +135,6 @@ exports.updateProduct = (req, res) => {
   const image = req.file ? req.file.filename : null;
   const productStatus = req.body.productStatus === "true" ? 1 : 0;
   const bestSeller = req.body.bestSeller === "false" ? 0 : 1;
-
-  console.log(req.body);
-  console.log(image);
-  console.log(productStatus);
-  console.log(bestSeller);
 
   try {
     if (

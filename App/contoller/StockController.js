@@ -45,7 +45,7 @@ exports.updateStock = (req, res) => {
 };
 
 exports.deleteStock = (req,res) => {
-    const stockId = req.body.stockId;
+    const stockId = req.query.stockId;
     try {
         if(!stockId) {
             res.status(400).send({message: "Check Data"})
