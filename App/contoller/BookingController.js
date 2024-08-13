@@ -24,6 +24,8 @@ exports.Booking = (req, res) => {
     }
 };
 
+
+
 exports.getBooking = (req, res) => {
     try {
         const { customerId, bookingDate, bookingTime } = req.body;
