@@ -1,8 +1,6 @@
 const OfferModal = require("../Modal/OfferModal");
 
 exports.Offer = (req, res) => {
-  console.log(req.body);
-  
   const offerType = req.body.offerType;
   const categoryId = req.body.categoryId;
   const productId = req.body.productId;
@@ -46,6 +44,23 @@ exports.offerGet = (req, res) => {
     throw e;
   }
 };
+
+exports.offerGetByOfferType = (req, res) => {
+  const offerType = req.query.offerType;
+  try {
+    if(!offerType) {
+      res.status(400).send({message: "Check data"})
+    } else {
+      OfferModal.offerGetByOfferType(offerType, (err, data) => {
+        if(err) res.status(400).send(err.error);
+        else res.send(data);
+      })
+    }
+
+  } catch (e) {
+    throw(e);
+  }
+}
 
 exports.OfferDelete = (req, res) => {
   const offerId = req.query.offerId;

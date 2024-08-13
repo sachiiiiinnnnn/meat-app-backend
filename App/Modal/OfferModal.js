@@ -1,5 +1,5 @@
 const pool = require("../Configuration/Config");
-const moment = require('moment')
+const moment = require("moment");
 const OfferModal = function (req) {};
 
 OfferModal.offer = (input, output) => {
@@ -37,7 +37,10 @@ OfferModal.offer = (input, output) => {
       if (err) {
         output({ error: { description: err.message } }, null);
       } else {
-        output(null, { message: "Product details inserted successfully", result});
+        output(null, {
+          message: "Product details inserted successfully",
+          result,
+        });
       }
     }
   );
@@ -55,10 +58,31 @@ OfferModal.offerGet = (callback) => {
     if (err) {
       callback({ error: { description: err } }, null);
     } else {
-      const formattedResults = result.map(row => ({
+      const formattedResults = result.map((row) => ({
         ...row,
-        fromDate: moment(row.fromDate).format('YYYY-MM-DD'),
-        endDate: moment(row.endDate).format('YYYY-MM-DD'),
+        fromDate: moment(row.fromDate).format("YYYY-MM-DD"),
+        endDate: moment(row.endDate).format("YYYY-MM-DD"),
+      }));
+      callback(null, formattedResults);
+    }
+  });
+};
+OfferModal.offerGetByOfferType = (offerType, callback) => {
+  const getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
+                          FROM offerdetails
+                          JOIN categorydetails 
+                          on categorydetails.categoryId = offerdetails.categoryId
+                          JOIN productdetails 
+                          on productdetails.productId = offerdetails.productId 
+                          WHERE offerdetails.offerType = ?;`;
+  pool.query(getOfferByOffType, [offerType], (err, result) => {
+    if (err) {
+      callback({ error: { description: err } }, null);
+    } else {
+      const formattedResults = result.map((row) => ({
+        ...row,
+        fromDate: moment(row.fromDate).format("YYYY-MM-DD"),
+        endDate: moment(row.endDate).format("YYYY-MM-DD"),
       }));
       callback(null, formattedResults);
     }
@@ -73,14 +97,25 @@ OfferModal.OfferDelete = (offerId, output) => {
   });
 };
 
-OfferModal.OfferUpdate = (offerId, offerPercentage, maxDiscount, usageLimit, fromDate, endDate, output) => {
+OfferModal.OfferUpdate = (
+  offerId,
+  offerPercentage,
+  maxDiscount,
+  usageLimit,
+  fromDate,
+  endDate,
+  output
+) => {
+  const updateOffer = `UPDATE offerdetails SET offerPercentage = ?, maxDiscount = ?, usageLimit = ?, fromDate = ?, endDate = ? WHERE OfferId = ?`;
 
-    const updateOffer = `UPDATE offerdetails SET offerPercentage = ?, maxDiscount = ?, usageLimit = ?, fromDate = ?, endDate = ? WHERE OfferId = ?`;
-
-    pool.query(updateOffer, [offerPercentage, maxDiscount, usageLimit, fromDate, endDate, offerId], (err, result) => {
-        if(err) output({error: {description: err}}, null);
-        else output(null, {message: "Offer Updated successfully", result});
-    })
-}
+  pool.query(
+    updateOffer,
+    [offerPercentage, maxDiscount, usageLimit, fromDate, endDate, offerId],
+    (err, result) => {
+      if (err) output({ error: { description: err } }, null);
+      else output(null, { message: "Offer Updated successfully", result });
+    }
+  );
+};
 
 module.exports = OfferModal;

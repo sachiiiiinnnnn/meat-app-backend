@@ -4,7 +4,7 @@ const pool = require("../Configuration/Config");
 
 const ProductModal = function (req) {};
 
-const baseUrl = "http://192.168.1.12:8080/uploads/products"; // Update this with your server address
+const baseUrl = "http://192.168.0.143:8080/uploads/products"; // Update this with your server address
 
 ProductModal.product = (input, output) => {
   const { productName, productDescription, mass, pieces, price, categoryId, image, productStatus, quantity, bestSeller } = input;
@@ -86,6 +86,35 @@ ProductModal.getProductByCategory = (categoryId, callback) => {
       }));
       callback(null, modifiedResults);
     }
+  });
+};
+
+ProductModal.getProductByCategoryAll = (categoryId, callback) => {
+  const query = 'SELECT * FROM productDetails WHERE categoryId = ?';
+  pool.query(query, [categoryId], (err, result) => {
+    if(err) {
+      callback({ error: {description: err.message}}, null);
+    } else {
+      const modifiedResults = result.map(product => ({
+        ...product,
+        image: `${baseUrl}/${product.image}`
+      }));
+      callback(null, modifiedResults);
+    }
+  })
+
+}
+
+ProductModal.updateProductStatus = (productId, productStatus, callback) => {
+ 
+  
+  const updateProductStatusQuery = `UPDATE productDetails SET productStatus = ? WHERE productId = ?`;
+
+  pool.query(updateProductStatusQuery, [productStatus, productId], (err, result) => {
+    if (err) {
+      return callback({ description: err.message }, null);
+    }
+    callback(null, { message: "Product status updated successfully" })
   });
 };
 
