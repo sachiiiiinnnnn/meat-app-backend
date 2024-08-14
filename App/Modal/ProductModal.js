@@ -118,11 +118,24 @@ ProductModal.updateProductStatus = (productId, productStatus, callback) => {
   });
 };
 
+ProductModal.updateBestSeller = (productId, bestSeller, callback) => {
+ 
+  
+  const updateBestSellerQuery = `UPDATE productDetails SET bestSeller = ? WHERE productId = ?`;
+
+  pool.query(updateBestSellerQuery, [bestSeller, productId], (err, result) => {
+    if (err) {
+      return callback({ description: err.message }, null);
+    }
+    callback(null, { message: "BestSeller updated successfully" })
+  });
+};
+
 ProductModal.updateProduct = (input, output) => {
-  const { productName, productDescription, mass, pieces, price, categoryId, image, productStatus, quantity, bestSeller, productId } = input;
+  const { productName, productDescription, mass, pieces, price, image, quantity, productId } = input;
 
 
-  const updateProduct = `UPDATE productDetails SET productName = ?, productDescription = ?, mass = ?, pieces = ?, price = ?, categoryId = ?, image = ?, productStatus = ?,quantity = ?, bestSeller = ? WHERE productId = ?`;
+  const updateProduct = `UPDATE productDetails SET productName = ?, productDescription = ?, mass = ?, pieces = ?, price = ?, image = ?, quantity = ? WHERE productId = ?`;
 
   // First, get the current image to delete the old one
   ProductModal.getProductById(productId, (err, product) => {
@@ -131,7 +144,7 @@ ProductModal.updateProduct = (input, output) => {
     } else {
       const oldImage = product.image;
 
-      pool.query(updateProduct, [productName, productDescription, mass, pieces, price, categoryId, image, productStatus, quantity, bestSeller, productId], (err, result) => {
+      pool.query(updateProduct, [productName, productDescription, mass, pieces, price, image, quantity, productId], (err, result) => {
         if (err) {
           output({ error: { description: err.message } }, null);
         } else {

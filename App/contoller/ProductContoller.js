@@ -129,12 +129,9 @@ exports.updateProduct = (req, res) => {
     mass,
     pieces,
     price,
-    categoryId,
     quantity,
   } = req.body;
   const image = req.file ? req.file.filename : null;
-  const productStatus = req.body.productStatus === "true" ? 1 : 0;
-  const bestSeller = req.body.bestSeller === "false" ? 0 : 1;
 
   try {
     if (
@@ -144,7 +141,6 @@ exports.updateProduct = (req, res) => {
       !mass ||
       !pieces ||
       !price ||
-      !categoryId ||
       !quantity ||
       !image
     ) {
@@ -159,10 +155,7 @@ exports.updateProduct = (req, res) => {
           pieces,
           price,
           quantity,
-          categoryId,
           image,
-          productStatus,
-          bestSeller,
         },
         (err, data) => {
           if (err) res.status(400).send(err.error);
@@ -172,6 +165,26 @@ exports.updateProduct = (req, res) => {
     }
   } catch (e) {
     throw e;
+  }
+};
+exports.updateBestSeller = (req, res) => {
+  const bestSeller = req.body.bestSeller === "false" ? 0 : 1;
+  const productId = req.body.productId;
+
+  try {
+    if (!productId ||typeof bestSeller === 'undefined') {
+      return res.status(400).send({ message: "Product ID and Status are required." });
+    }
+
+    ProductModal.updateBestSeller(productId, bestSeller, (err, data) => {
+      if (err) {
+        return res.status(400).send({ message: err.description });
+      }
+      res.send({ message: "bestSeller updated successfully" });
+    });
+  } catch (e) {
+    console.error("Error updating product status:", e);
+    res.status(500).send({ message: "Internal Server Error" });
   }
 };
 
