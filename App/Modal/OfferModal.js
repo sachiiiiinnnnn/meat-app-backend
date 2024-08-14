@@ -68,25 +68,60 @@ OfferModal.offerGet = (callback) => {
   });
 };
 OfferModal.offerGetByOfferType = (offerType, callback) => {
-  const getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
+  if(offerType === "ref") {
+    const getOfferByOffType = `SELECT * FROM offerdetails WHERE offerType = ?`;
+    pool.query(getOfferByOffType, [offerType], (err, result) => {
+      if (err) {
+        callback({ error: { description: err } }, null);
+      } else {
+        callback(null, result);
+      }
+    });
+  } else if (offerType === "persn") {
+    const getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
                           FROM offerdetails
                           JOIN categorydetails 
                           on categorydetails.categoryId = offerdetails.categoryId
                           JOIN productdetails 
                           on productdetails.productId = offerdetails.productId 
-                          WHERE offerdetails.offerType = ?;`;
-  pool.query(getOfferByOffType, [offerType], (err, result) => {
-    if (err) {
-      callback({ error: { description: err } }, null);
-    } else {
-      const formattedResults = result.map((row) => ({
-        ...row,
-        fromDate: moment(row.fromDate).format("YYYY-MM-DD"),
-        endDate: moment(row.endDate).format("YYYY-MM-DD"),
-      }));
-      callback(null, formattedResults);
-    }
-  });
+                          WHERE customerType = "Particular" AND customerId IS NOT null`;
+    pool.query(getOfferByOffType, [offerType], (err, result) => {
+      if (err) {
+        callback({ error: { description: err } }, null);
+      } else {
+        const formattedResults = result.map((row) => ({
+          ...row,
+          fromDate: moment(row.fromDate).format("YYYY-MM-DD"),
+          endDate: moment(row.endDate).format("YYYY-MM-DD"),
+        }));
+        callback(null, formattedResults);
+      }
+    });
+  } else {
+    const getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
+                          FROM offerdetails
+                          JOIN categorydetails 
+                          on categorydetails.categoryId = offerdetails.categoryId
+                          JOIN productdetails 
+                          on productdetails.productId = offerdetails.productId 
+                          WHERE offerdetails.offerType = ?`;
+    pool.query(getOfferByOffType, [offerType], (err, result) => {
+      if (err) {
+        callback({ error: { description: err } }, null);
+      } else {
+        const formattedResults = result.map((row) => ({
+          ...row,
+          fromDate: moment(row.fromDate).format("YYYY-MM-DD"),
+          endDate: moment(row.endDate).format("YYYY-MM-DD"),
+        }));
+        callback(null, formattedResults);
+      }
+    });
+
+  }
+  
+
+  
 };
 
 OfferModal.OfferDelete = (offerId, output) => {

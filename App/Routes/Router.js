@@ -69,7 +69,8 @@ module.exports = (App) => {
   router.get('/user/Product/BestSeller', Product.getBestSeller);
   router.get('/user/Product/category', Product.getProductByCategoryAll);
   router.put('/user/Product/ProductStatus', Product.productStatus);
-
+  router.put('/user/Product/Update/BestSeller', Product.updateBestSeller);
+  
   
   router.post("/user/Location", Location.Location);
   router.get("/user/Location", Location.getLocation);
