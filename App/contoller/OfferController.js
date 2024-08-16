@@ -87,7 +87,7 @@ exports.updateOffer = (req, res) => {
     const endDate = req.body.endDate;
 
     try {
-        if(!offerId || !offerPercentage || !maxDiscount || !usageLimit || !fromDate || !endDate) {
+        if(!offerId || !offerPercentage || !maxDiscount || !fromDate || !endDate) {
             res.status(400).send({ message: "Check data" });
         } else {
     OfferModal.OfferUpdate(offerId, offerPercentage, maxDiscount, usageLimit, fromDate, endDate, (err, data) => {
