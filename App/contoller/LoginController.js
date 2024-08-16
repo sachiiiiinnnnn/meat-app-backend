@@ -5,7 +5,7 @@ exports.Login = (req, res) => {
   const { otp, customerName, customerEmail, customerId } = req.body;
 
   try {
-    if (!otp || !customerName || !customerEmail || !customerId) {
+    if (!otp || !customerId) {
       return res.status(400).send({ message: "All fields are required" });
     }
 
@@ -17,32 +17,33 @@ exports.Login = (req, res) => {
         // OTP is valid, now update user details
         LoginModal.updateUserDetails(req.body, (err, updateResult) => {
           if (err) return res.status(400).send(err.error);
-          
+
           res.send(updateResult);
-         
         });
       } else {
         // OTP is invalid
         res.status(400).send({ message: "Invalid OTP" });
       }
     });
+
+
   } catch (e) {
-    res.status(500).send({ message: "Internal Server Error", error: e.message });
+    res
+      .status(500)
+      .send({ message: "Internal Server Error", error: e.message });
   }
 };
- 
 
 exports.getLogin = (req, res) => {
   try {
-       LoginModal. getLogin(req, (err, data) => {
+    LoginModal.getLogin(req, (err, data) => {
       if (err) res.status(400).send(err.error);
       else res.send(data);
-    });  
+    });
   } catch (e) {
     throw e;
   }
 };
-
 
 exports.getCustomerId = (req, res) => {
   const customerId = req.body.customerId; // Use query parameter for customerId
@@ -56,13 +57,8 @@ exports.getCustomerId = (req, res) => {
     res.status(500).send({ message: "Internal Server Error" });
   }
 };
- 
-
-
-
 
 exports.generateOtp = (req, res) => {
-
   const { customerMobile } = req.body;
 
   try {
@@ -81,7 +77,8 @@ exports.generateOtp = (req, res) => {
         // User already exists, update OTP
         LoginModal.updateOtp({ otp, customerId }, (err, otpData) => {
           if (err) return res.status(400).send({ error: err.message });
-          res.send({ message: "OTP updated and resent successfully", customerId });
+          res.send({ ...otpData, customerId, alreadyExist: true });
+          // res.send({ message: "OTP updated and resent successfully", customerId , });
         });
       } else {
         // New user, insert user and generate OTP
@@ -89,10 +86,14 @@ exports.generateOtp = (req, res) => {
           if (err) return res.status(400).send({ error: err.message });
           const newCustomerId = newCustomerData.insertId;
 
-          LoginModal.insertOtp({ otp, customerId: newCustomerId }, (err, otpData) => {
-            if (err) return res.status(400).send({ error: err.message });
-            res.send(otpData);
-          });
+          LoginModal.insertOtp(
+            { otp, customerId: newCustomerId },
+            (err, otpData) => {
+              if (err) return res.status(400).send({ error: err.message });
+              res.send({ ...otpData, alreadyExist: false });
+              // res.send(otpData);
+            }
+          );
         });
       }
     });
@@ -101,7 +102,6 @@ exports.generateOtp = (req, res) => {
   }
 };
 
-
 exports.updateLogin = (req, res) => {
   const { customerId, customerName, customerEmail } = req.body;
 
@@ -109,12 +109,17 @@ exports.updateLogin = (req, res) => {
     if (!customerId || !customerName || !customerEmail) {
       res.status(400).send({ message: "Check data" });
     } else {
-      LoginModal.updateLogin({ customerId, customerName, customerEmail }, (err, data) => {
-        if (err) res.status(400).send(err.error);
-        else res.send(data);
-      });
+      LoginModal.updateLogin(
+        { customerId, customerName, customerEmail },
+        (err, data) => {
+          if (err) res.status(400).send(err.error);
+          else res.send(data);
+        }
+      );
     }
   } catch (e) {
-    res.status(500).send({ message: "Internal Server Error", error: e.message });
+    res
+      .status(500)
+      .send({ message: "Internal Server Error", error: e.message });
   }
 };

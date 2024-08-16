@@ -111,6 +111,6 @@ module.exports = (App) => {
     );
     next();
   };
-  App.use("/api",  router);
+  App.use("/api",log,  router);
   App.use('/uploads', express.static(path.join(__dirname, '../uploads'))); 
 };

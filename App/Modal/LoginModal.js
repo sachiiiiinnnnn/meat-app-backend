@@ -27,6 +27,7 @@ LoginModal.updateUserDetails = (input, output) => {
   const query = `UPDATE customerdetails SET customerName = ?, customerEmail = ? WHERE customerId = ?`;
   const query1 = `SELECT * FROM customerdetails WHERE customerId = ?`;
 
+  if (customerName && customerEmail) {
   pool.query(query, [customerName, customerEmail, customerId], (err, result) => {
     if (err) {
       return output({ error: { description: err.message } }, null);
@@ -40,7 +41,20 @@ LoginModal.updateUserDetails = (input, output) => {
       output(null, { message: "User details updated successfully", result });
     });
   });
+}else if (customerId){
+  pool.query(query1, [customerId], (err, result) => {
+    if (err) {
+      return output({ error: { description: err.message } }, null);
+    }
+
+    output(null, { result });
+  });
+} else {
+  // Handle case where neither customerName, customerEmail, nor customerId is provided
+  output({ error: { description: "Missing required parameters" } }, null);
+}
 };
+
 
 LoginModal.getLogin = (input, output) => {
 
@@ -72,6 +86,10 @@ LoginModal.getCustomerId = (customerId, output) => {
     }
   });
 };
+
+
+
+
 
 LoginModal.checkUserExists = ({ customerMobile }, output) => {
   const query = `SELECT * FROM customerdetails WHERE customerMobile = ?`;
@@ -130,6 +148,8 @@ LoginModal.updateOtp = (input, output) => {
     output(null, { message: "OTP updated successfully" });
   });
 };
+
+
 
 
 LoginModal.updateLogin = (input, output) => {
