@@ -4,6 +4,7 @@ const pool = require("../Configuration/Config");
 
 const CategoryModal = function (req) {};
 
+
 const baseUrl = "http://192.168.1.4:8080/uploads/category"; // Base URL for image access
 
 CategoryModal.category = (input, output) => {
