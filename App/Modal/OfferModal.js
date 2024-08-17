@@ -67,7 +67,7 @@ OfferModal.offerGet = (callback) => {
     }
   });
 };
-OfferModal.offerGetByOfferType = (offerType, callback) => {
+OfferModal.offerGetByOfferType = (offerType, offerTime, callback) => {
   if(offerType === "ref") {
     const getOfferByOffType = `SELECT * FROM offerdetails WHERE offerType = ?`;
     pool.query(getOfferByOffType, [offerType], (err, result) => {
@@ -79,14 +79,15 @@ OfferModal.offerGetByOfferType = (offerType, callback) => {
     });
   } else if (offerType === "persn") {
     const getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName, customerdetails.customerName
-                          FROM offerdetails
-                          JOIN categorydetails 
-                          on categorydetails.categoryId = offerdetails.categoryId
-                          JOIN productdetails 
-                          on productdetails.productId = offerdetails.productId 
-                          JOIN customerdetails
-                          on customerdetails.customerId = offerdetails.customerId
-                          WHERE customerType = "Particular" AND customerId IS NOT null`;
+                                FROM offerdetails
+                                JOIN categorydetails 
+                                ON categorydetails.categoryId = offerdetails.categoryId
+                                JOIN productdetails 
+                                ON productdetails.productId = offerdetails.productId
+                                JOIN customerdetails
+                                ON customerdetails.customerId = offerdetails.customerId
+                                WHERE offerdetails.customerType = "Particular" 
+                                AND offerdetails.customerId IS NOT NULL`;
     pool.query(getOfferByOffType, [offerType], (err, result) => {
       if (err) {
         callback({ error: { description: err } }, null);
@@ -100,13 +101,32 @@ OfferModal.offerGetByOfferType = (offerType, callback) => {
       }
     });
   } else {
-    const getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
+    let getOfferByOffType;
+    if(offerTime === "upcoming"){
+      getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
                           FROM offerdetails
                           JOIN categorydetails 
                           on categorydetails.categoryId = offerdetails.categoryId
                           JOIN productdetails 
                           on productdetails.productId = offerdetails.productId 
-                          WHERE offerdetails.offerType = ?`;
+                          WHERE offerdetails.offerType = ? AND CURRENT_DATE < fromDate`;
+    } else if(offerTime === "active") {
+      getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
+                          FROM offerdetails
+                          JOIN categorydetails 
+                          on categorydetails.categoryId = offerdetails.categoryId
+                          JOIN productdetails 
+                          on productdetails.productId = offerdetails.productId 
+                          WHERE offerdetails.offerType = ? AND CURRENT_DATE >= fromDate AND CURRENT_DATE <= endDate`;
+    } else {
+      getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
+                          FROM offerdetails
+                          JOIN categorydetails 
+                          on categorydetails.categoryId = offerdetails.categoryId
+                          JOIN productdetails 
+                          on productdetails.productId = offerdetails.productId 
+                          WHERE offerdetails.offerType = ? AND CURRENT_DATE > endDate`;
+    }
     pool.query(getOfferByOffType, [offerType], (err, result) => {
       if (err) {
         callback({ error: { description: err } }, null);

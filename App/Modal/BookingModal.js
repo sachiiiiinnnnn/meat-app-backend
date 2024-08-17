@@ -69,6 +69,28 @@ BookingModal.getBooking = (customerId, bookingDate, bookingTime, output) => {
         }
     });
 };
+BookingModal.getOverallBooking = (output) => {
+    const getBookingQuery =`SELECT bookingdetails.*, categorydetails.categoryName, productdetails.productName, customerdetails.customerName
+                            FROM bookingdetails
+                            JOIN categorydetails 
+                            ON categorydetails.categoryId = bookingdetails.categoryId
+                            JOIN productdetails 
+                            ON productdetails.productId = bookingdetails.productId
+                            JOIN customerdetails
+                            ON customerdetails.customerId = bookingdetails.customerId;`;
+    pool.query(getBookingQuery,(err, result) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        output({ error: { description: err } }, null);
+      } else {
+        const formattedResults = result.map(row => ({
+            ...row,
+            bookingDate: moment(row.bookingDate).format('YYYY-MM-DD')
+          }));
+        output(null, formattedResults);
+      }
+    });
+  };
 
 BookingModal.updateBooking = (input, output) => {
         const {bookingId, productId, quantity, bookingDate, categoryId, bookingStatus} = input;
