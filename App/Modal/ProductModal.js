@@ -4,7 +4,7 @@ const pool = require("../Configuration/Config");
 
 const ProductModal = function (req) {};
 
-const baseUrl = "http://192.168.0.169:8080/uploads/products"; // Update this with your server address
+const baseUrl = "http://192.168.0.118:8080/uploads/products"; // Update this with your server address
 
 ProductModal.product = (input, output) => {
   const { productName, productDescription, mass, pieces, price, categoryId, image, productStatus, quantity, bestSeller } = input;
