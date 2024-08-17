@@ -3,7 +3,7 @@ const twilioDeatils = require("../../index")
 const client = require("twilio")(twilioDeatils.accountSid, twilioDeatils.authToken);
 const { Login } = require("../contoller/LoginController");
 
-const baseUrl = "http://192.168.0.169:8080/uploads/profile";
+const baseUrl = "http://192.168.0.118:8080/uploads/profile";
 
 const LoginModal = function (req) { };
 
@@ -21,6 +21,33 @@ LoginModal.login = (input, output) => {
     }
   });
 };
+
+
+// LoginModal.login = (input, output) => {
+//   const { otp, customerId } = input;
+
+//   const query = `SELECT * FROM otp WHERE otp = ? AND customerId = ?`;
+
+//   pool.query(query, [otp, customerId], (err, result) => {
+//     if (err) return output({ error: { description: err.message } }, null);
+//   console.log('====================================');
+//   console.log(result);
+//   console.log('====================================');
+//     if (result.length > 0) {
+//       const imageUrls = result.map(customer => 
+//         customer.image ? `${baseUrl}/${customer.image}` : null
+//       );
+// console.log('====================================');
+// console.log(baseUrl);
+// console.log('====================================');
+//       output(null, { valid: true, images: imageUrls });
+//     } else {
+//       output(null, { valid: false, images: [] });
+//     }
+//   });
+// };
+
+
 
 LoginModal.updateUserDetails = (input, output) => {
   const { customerName, customerEmail, customerId } = input;
