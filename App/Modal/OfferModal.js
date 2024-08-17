@@ -78,12 +78,14 @@ OfferModal.offerGetByOfferType = (offerType, callback) => {
       }
     });
   } else if (offerType === "persn") {
-    const getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
+    const getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName, customerdetails.customerName
                           FROM offerdetails
                           JOIN categorydetails 
                           on categorydetails.categoryId = offerdetails.categoryId
                           JOIN productdetails 
                           on productdetails.productId = offerdetails.productId 
+                          JOIN customerdetails
+                          on customerdetails.customerId = offerdetails.customerId
                           WHERE customerType = "Particular" AND customerId IS NOT null`;
     pool.query(getOfferByOffType, [offerType], (err, result) => {
       if (err) {
