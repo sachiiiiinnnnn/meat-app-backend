@@ -123,3 +123,20 @@ exports.updateLogin = (req, res) => {
       .send({ message: "Internal Server Error", error: e.message });
   }
 };
+
+exports.updateProfiles = (req, res) => {   
+  const customerId = req.body.customerId;
+  const image = req.file ? req.file.filename : null;  
+  try {
+    if (!customerId) {
+      res.status(400).send({ message: "Check data" });
+    } else {      
+      LoginModal.UpdateProfile(customerId, image , (err, data) => {
+        if (err) res.status(400).send(err.error);
+        else res.send(data);
+      });
+    }
+  } catch (e) {
+    throw e;
+  }
+};
