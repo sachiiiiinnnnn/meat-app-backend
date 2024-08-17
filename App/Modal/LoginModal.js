@@ -3,6 +3,7 @@ const twilioDeatils = require("../../index")
 const client = require("twilio")(twilioDeatils.accountSid, twilioDeatils.authToken);
 const { Login } = require("../contoller/LoginController");
 
+const baseUrl = "http://192.168.0.169:8080/uploads/profile";
 
 const LoginModal = function (req) { };
 
@@ -57,20 +58,23 @@ LoginModal.updateUserDetails = (input, output) => {
 
 
 LoginModal.getLogin = (input, output) => {
+  const getUser = `SELECT * FROM customerdetails`;
 
-  const getUser = `select * from customerdetails`;
-
-  pool.query(getUser, function (err, result) {
-    console.log(err);
-    if (err) output({ error: { description: err } }, null);
-    else {
-      output(null, result);
+  pool.query(getUser, (err, result) => {
+    if (err) {
+      output({ error: { description: err.message } }, null);
+    } else {
+      const profileWithImageUrls = result.map(customer => ({
+        ...customer,
+        image: `${baseUrl}/${customer.image}`
+      }));
+      output(null, profileWithImageUrls);
     }
   });
 };
 
-
-LoginModal.getCustomerId = (customerId, output) => {
+// Function to retrieve a customer by ID
+LoginModal.getCustomerById = (customerId, output) => {
   let query = `SELECT * FROM customerdetails`;
   let params = [];
 
@@ -80,13 +84,21 @@ LoginModal.getCustomerId = (customerId, output) => {
   }
 
   pool.query(query, params, (err, result) => {
-    if (err) output({ error: { description: err.message } }, null);
-    else {
-      output(null, result);
+    if (err) {
+      output({ error: { description: err.message } }, null);
+    } else {
+      if (result.length > 0) {
+        const profileWithImageUrls = result.map(customer => ({
+          ...customer,
+          image: `${baseUrl}/${customer.customerProfile}`
+        }));
+        output(null, profileWithImageUrls);
+      } else {
+        output({ error: { description: "Customer not found" } }, null);
+      }
     }
   });
 };
-
 
 
 
@@ -177,6 +189,55 @@ LoginModal.updateLogin = (input, output) => {
     }
   });
 };
+
+LoginModal.UpdateProfile = (customerId, Profileimage, output) => {
+  const profile = `UPDATE customerdetails SET image = ? WHERE customerId = ?`;
+  pool.query(profile, [Profileimage, customerId], (err, result) => {
+    if(err) {
+      output({ description: err.message }, null)
+    } else {
+      output(null, result)
+    }
+  })
+}
+
+
+// LoginModal.UpdateProfile = (input, output) => {
+//   const { customerId, Profileimage } = input;
+
+//   const updateProfileQuery = `UPDATE customerdetails SET customerProfile = ? WHERE customerId = ?`;
+
+//   LoginModal.getCustomerId(customerId, (err, customer) => {
+//     if (err) {
+//       output({ error: { description: err.message } }, null);
+//     } else {
+//       const oldProfileImage = customer.customerProfile;
+
+//       pool.query(updateProfileQuery, [Profileimage, customerId], (err, result) => {
+//         if (err) {
+//           output({ error: { description: err.message } }, null);
+//         } else {
+//           if (Profileimage && oldProfileImage) {
+//             const oldImagePath = path.join(__dirname, '../uploads/profile', path.basename(oldProfileImage));
+//             fs.unlink(oldImagePath, (err) => {
+//               if (err) {
+//                 console.error(`Error deleting old profile image: ${err.message}`);
+//               }
+//             });
+//           }
+//           const getCustomerQuery = `SELECT * FROM customerdetails WHERE customerId = ?`;
+//           pool.query(getCustomerQuery, [customerId], (err, data) => {
+//             if (err) {
+//               output({ error: { description: err.message } }, null);
+//             } else {
+//               output(null, { message: "Customer profile updated successfully", data });
+//             }
+//           });
+//         }
+//       });
+//     }
+//   });
+// };
 
 
 module.exports = LoginModal;

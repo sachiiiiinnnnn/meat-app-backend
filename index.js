@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // Serve static files from the "uploads" directory
 app.use('/uploads', express.static(path.join(__dirname, '../uploads/products')));
 app.use('/uploads', express.static(path.join(__dirname, '../uploads/category')));
-
+app.use('/uploads', express.static(path.join(__dirname, '../uploads/profile')));
 
 require("./App/Routes/Router")(app);
 

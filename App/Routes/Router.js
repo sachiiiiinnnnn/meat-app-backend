@@ -38,10 +38,21 @@ module.exports = (App) => {
       cb(null, file.fieldname + '-' + uniqueSuffix + '-' + file.originalname);
     }
   });
+
+  const profileStorage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, path.join(__dirname, '../uploads/profile'));
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      cb(null, file.fieldname + '-' + uniqueSuffix + '-' + file.originalname);
+    }
+  });
   
   // Multer instances
   const uploadCategory = multer({ storage: categoryStorage });
   const uploadProduct = multer({ storage: productStorage });
+  const uploadProfile = multer({ storage: profileStorage });
 
 
 
@@ -51,7 +62,8 @@ module.exports = (App) => {
   router.get("/user/Login", Login.getLogin);
   router.get("/user/Login/CustomerId", Login.getCustomerId);
   router.post("/user/Login/Otp", Login.generateOtp);
-  router.put("/user/Login/Edit", Login.updateLogin); 
+  router.put("/user/Login/Edit", Login.updateLogin);
+  router.put("/user/Login/customerProfile", uploadProfile.single('image'), Login.updateProfiles)
 
   
   router.post("/user/Category", uploadCategory.single('image'), Category.Category);
@@ -111,6 +123,6 @@ module.exports = (App) => {
     );
     next();
   };
-  App.use("/api",log,  router);
+  App.use("/api",  router);
   App.use('/uploads', express.static(path.join(__dirname, '../uploads'))); 
 };

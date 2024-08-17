@@ -168,7 +168,7 @@ exports.updateProduct = (req, res) => {
   }
 };
 exports.updateBestSeller = (req, res) => {
-  const bestSeller = req.body.bestSeller === "false" ? 0 : 1;
+  const bestSeller = req.body.bestSeller === false ? 0 : 1;
   const productId = req.body.productId;
 
   try {
