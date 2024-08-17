@@ -47,6 +47,16 @@ exports.getBooking = (req, res) => {
         res.status(500).send({ message: "Server error" });
     }
 };
+exports.getOverallBooking = (req, res) => {
+    try {
+      BookingModal.getOverallBooking((err, data) => {
+        if (err) res.status(400).send(err.error);
+        else res.send(data);
+      });
+    } catch (e) {
+      throw e;
+    }
+  };
 
 exports.updateBooking = (req, res) => {
     try {

@@ -47,11 +47,12 @@ exports.offerGet = (req, res) => {
 
 exports.offerGetByOfferType = (req, res) => {
   const offerType = req.query.offerType;
+  const offerStatus = req.query.offerStatus
   try {
-    if(!offerType) {
+    if(!offerType || !offerStatus) {
       res.status(400).send({message: "Check data"})
     } else {
-      OfferModal.offerGetByOfferType(offerType, (err, data) => {
+      OfferModal.offerGetByOfferType(offerType, offerStatus, (err, data) => {
         if(err) res.status(400).send(err.error);
         else res.send(data);
       })
