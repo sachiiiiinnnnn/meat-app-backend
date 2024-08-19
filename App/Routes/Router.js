@@ -90,6 +90,7 @@ module.exports = (App) => {
 
   router.post("/user/Booking", Booking.Booking);
   router.get("/user/Booking", Booking.getBooking);
+  router.get("/user/Booking/CustomerId", Booking.getBookingCustomerID);
   router.put("/user/Booking", Booking.updateBooking);
   router.get("/user/Overall/Booking", Booking.getOverallBooking);
 

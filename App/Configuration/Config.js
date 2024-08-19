@@ -84,7 +84,7 @@ pool.connect(function (err) {
     const createstockdetail = `CREATE TABLE IF NOT EXISTS stockdetails (
   stockId INT NOT NULL AUTO_INCREMENT PRIMARY KEY, 
   stock INT NOT NULL, 
-  stockdate DATE NOT NULL, 
+  stockDate DATE NOT NULL, 
   categoryId INT NOT NULL,
   productId INT NOT NULL, 
   FOREIGN KEY (categoryId) REFERENCES categoryDetails(categoryId),

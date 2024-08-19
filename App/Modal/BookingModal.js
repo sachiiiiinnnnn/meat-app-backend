@@ -1,8 +1,6 @@
 const pool = require("../Configuration/Config");
-const ProductModal = require("./ProductModal");
 const StockModal = require("./StockModal");
-const { format } = require('date-fns');
-
+const moment = require("moment")
 
 const BookingModal = function (req) {};
 
@@ -11,7 +9,9 @@ BookingModal.booking = (input, output) => {
 
     const processBooking = (booking, callback) => {
         const { productId, customerId, locationId, quantity, amount, categoryId, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus } = booking;
-
+        const now = new Date();
+        const currentDate = now.toISOString().split('T')[0]; 
+        const currentTime = now.toTimeString().split(' ')[0];
             StockModal.getStockById(productId, bookingDate, categoryId, (productErr, stockDetails) => {
             if (productErr) {
                 callback({ error: { description: "Product not found" } });
@@ -24,8 +24,8 @@ BookingModal.booking = (input, output) => {
                 } else if (stockDetails.stock < quantity && bookingDate === stockDate) {
                     callback({ error: { description: `Only ${stockDetails.stock} items available in stock` } });
                 } else {
-                    const insertBooking = `INSERT INTO bookingDetails (productId, customerId, locationId, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus, categoryId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-                    const values = [productId, customerId, locationId, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime , bookingStatus, categoryId];
+                    const insertBooking = `INSERT INTO bookingDetails (productId, customerId, locationId, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus, categoryId, orderedDate, orderedTime ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    const values = [productId, customerId, locationId, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime , bookingStatus, categoryId, currentDate, currentTime];
     
                     pool.query(insertBooking, values, (err, result) => {
                         if (err) {
@@ -69,6 +69,28 @@ BookingModal.getBooking = (customerId, bookingDate, bookingTime, output) => {
         }
     });
 };
+
+BookingModal.getBookingCustomerId = (customerId,output) => {
+    const getBookingCustomerID = `SELECT bookingdetails.*, categorydetails.categoryName, productdetails.productName, locationdetails.location, customerdetails.customerName FROM bookingdetails 
+    JOIN customerdetails 
+    ON customerdetails.customerId = bookingdetails.customerId
+    JOIN categorydetails
+    ON categorydetails.categoryId = bookingdetails.categoryId
+    JOIN productdetails
+    ON productdetails.productId = bookingdetails.productId
+    JOIN locationdetails
+    ON locationdetails.locationId = bookingdetails.locationId
+    WHERE bookingdetails.customerId = ?;`;
+    pool.query(getBookingCustomerID, [customerId], (err, result) => {
+        if (err) {
+            output({ error: { description: err.message } }, null);
+        } else {
+            output(null, result);
+        }
+    });
+};
+
+
 BookingModal.getOverallBooking = (output) => {
     const getBookingQuery =`SELECT bookingdetails.*, categorydetails.categoryName, productdetails.productName, customerdetails.customerName
                             FROM bookingdetails
