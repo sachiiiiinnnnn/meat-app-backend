@@ -24,6 +24,27 @@ exports.Booking = (req, res) => {
     }
 };
 
+exports.getBookingCustomerID = (req, res) => {
+    try {
+        const { customerId} = req.body;
+
+        if (!customerId ) {
+            res.status(400).send({ message: "Missing parameters" });
+        } else {
+            BookingModal.getBookingCustomerId(customerId, (err, data) => {
+                if (err) {
+                    console.error("Error retrieving booking:", err); // Log the error for debugging
+                    res.status(400).send(err.error);
+                } else {
+                    res.send(data);
+                }
+            });
+        }
+    } catch (e) {
+        console.error("Server error:", e); // Log the exception for debugging
+        res.status(500).send({ message: "Server error" });
+    }
+};
 
 
 exports.getBooking = (req, res) => {
@@ -47,6 +68,8 @@ exports.getBooking = (req, res) => {
         res.status(500).send({ message: "Server error" });
     }
 };
+
+
 exports.getOverallBooking = (req, res) => {
     try {
       BookingModal.getOverallBooking((err, data) => {

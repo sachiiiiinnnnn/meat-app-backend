@@ -3,7 +3,7 @@ const twilioDeatils = require("../../index")
 const client = require("twilio")(twilioDeatils.accountSid, twilioDeatils.authToken);
 const { Login } = require("../contoller/LoginController");
 
-const baseUrl = "http://192.168.0.118:8080/uploads/profile";
+const baseUrl = "http://192.168.0.231:8080/uploads/profile";
 
 const LoginModal = function (req) { };
 
