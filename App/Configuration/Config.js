@@ -67,6 +67,8 @@ pool.connect(function (err) {
     bookingStartTime VARCHAR(50) NOT NULL,  
     bookingEndTime VARCHAR(50) NOT NULL,
     bookingStatus VARCHAR(250) NOT NULL, 
+    orderedDate DATE,
+    orderedTime TIME,
     FOREIGN KEY (productId) REFERENCES productDetails(productId),
     FOREIGN KEY (customerId) REFERENCES customerDetails(customerId),
     FOREIGN KEY (locationId) REFERENCES locationDetails(locationId),
@@ -87,8 +89,8 @@ pool.connect(function (err) {
   stockDate DATE NOT NULL, 
   categoryId INT NOT NULL,
   productId INT NOT NULL, 
-  FOREIGN KEY (categoryId) REFERENCES categoryDetails(categoryId),
-  FOREIGN KEY (productId) REFERENCES productDetails(productId)
+  FOREIGN KEY (categoryId) REFERENCES categorydetails(categoryId),
+  FOREIGN KEY (productId) REFERENCES productdetails(productId)
 );`;
 
     const createofferdetail = `CREATE TABLE IF NOT EXISTS offerdetails (
