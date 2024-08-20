@@ -22,30 +22,38 @@ LoginModal.login = (input, output) => {
   });
 };
 
-
 // LoginModal.login = (input, output) => {
 //   const { otp, customerId } = input;
 
 //   const query = `SELECT * FROM otp WHERE otp = ? AND customerId = ?`;
 
 //   pool.query(query, [otp, customerId], (err, result) => {
-//     if (err) return output({ error: { description: err.message } }, null);
-//   console.log('====================================');
-//   console.log(result);
-//   console.log('====================================');
+//     if (err) {
+//       console.error('Database query error:', err.message);
+//       return output({ error: { description: err.message } }, null);
+//     }
+
 //     if (result.length > 0) {
-//       const imageUrls = result.map(customer => 
-//         customer.image ? `${baseUrl}/${customer.image}` : null
-//       );
-// console.log('====================================');
-// console.log(baseUrl);
-// console.log('====================================');
-//       output(null, { valid: true, images: imageUrls });
+//       // Map through the results and format the image URLs
+//       const customersWithImageUrls = result.map(customer => {
+//         return {
+//           ...customer,
+//           image: customer.image ? `${baseUrl}/${customer.image}` : null
+//         };
+//       });
+
+//       output(null, { valid: true, customers: customersWithImageUrls });
 //     } else {
-//       output(null, { valid: false, images: [] });
+//       output(null, { valid: false, customers: [] });
 //     }
 //   });
 // };
+
+
+
+
+
+
 
 
 

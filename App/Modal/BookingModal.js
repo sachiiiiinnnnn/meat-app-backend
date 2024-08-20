@@ -4,6 +4,9 @@ const moment = require("moment")
 
 const BookingModal = function (req) {};
 
+const baseUrl = "http://192.168.0.231:8080/uploads/products";
+
+
 BookingModal.booking = (input, output) => {
     const bookings = Array.isArray(input) ? input : [input]; // Ensure bookings is an array
 
@@ -71,7 +74,7 @@ BookingModal.getBooking = (customerId, bookingDate, bookingTime, output) => {
 };
 
 BookingModal.getBookingCustomerId = (customerId,output) => {
-    const getBookingCustomerID = `SELECT bookingdetails.*, categorydetails.categoryName, productdetails.productName, locationdetails.location, customerdetails.customerName FROM bookingdetails 
+    const getBookingCustomerID = `SELECT bookingdetails.*, categorydetails.categoryName, productdetails.productName,productdetails.image, locationdetails.location, customerdetails.customerName FROM bookingdetails 
     JOIN customerdetails 
     ON customerdetails.customerId = bookingdetails.customerId
     JOIN categorydetails
@@ -85,7 +88,15 @@ BookingModal.getBookingCustomerId = (customerId,output) => {
         if (err) {
             output({ error: { description: err.message } }, null);
         } else {
-            output(null, result);
+            const formattedResults = result.map(booking => {
+        return {
+          ...booking,
+          bookingDate: moment(booking.bookingDate).format('YYYY-MM-DD'),
+          orderedDate: moment(booking.orderedDate).format('YYYY-MM-DD'),
+          image: `${baseUrl}/${booking.image}`
+        };
+      });
+      output(null, formattedResults);
         }
     });
 };
@@ -114,44 +125,83 @@ BookingModal.getOverallBooking = (output) => {
     });
   };
 
+// BookingModal.updateBooking = (input, output) => {
+//         const {bookingId, productId, quantity, bookingDate, categoryId, bookingStatus} = input;
+
+//         if(bookingStatus === "cancel") {
+//             const updateBooking = `UPDATE bookingDetails SET bookingStatus = ? WHERE bookingId = ?`;
+//             pool.query(updateBooking ,[bookingStatus, bookingId], (err, result) => {
+//                 if(err) {
+//                     output({error : {description: err.message}}, null);
+//                 } else {
+//                     const getBooking = `SELECT * FROM bookingDetails WHERE bookingId = ?`;
+//                     pool.query(getBooking,[bookingId], (err, data) => {
+//                         if(err) output({error : {description: err.message}}, null);
+//                         else output(null, data);
+//                     })
+//                     StockModal.getStockByDateProCat( productId, bookingDate, categoryId, (err, data) => {
+//                         if(err) {
+//                             output(err, null);
+//                         } else {
+//                             const stockVale = {
+//                                 stockId: data[0].stockId,
+//                                 stock: quantity + data[0].stock
+//                             }
+//                             StockModal.updateStock(stockVale, (err, data) => {
+//                                 if(err) {
+//                                     output(err, null);
+//                                 } else {
+//                                     output(null, data);
+//                                 }
+//                             })
+//                         }
+//                     })
+//                 }
+//             })
+//         } else {
+//             output({ error: { description: "Booking is already cancelled" } }, null);
+//         }   
+// }
 BookingModal.updateBooking = (input, output) => {
-        const {bookingId, productId, quantity, bookingDate, categoryId, bookingStatus} = input;
+    const { bookingId, productId, quantity, bookingDate, categoryId, bookingStatus } = input;
 
-        if(bookingStatus === "cancel") {
-            const updateBooking = `UPDATE bookingDetails SET bookingStatus = ? WHERE bookingId = ?`;
-            pool.query(updateBooking ,[bookingStatus, bookingId], (err, result) => {
-                if(err) {
-                    output({error : {description: err.message}}, null);
-                } else {
-                    const getBooking = `SELECT * FROM bookingDetails WHERE bookingId = ?`;
-                    pool.query(getBooking,[bookingId], (err, data) => {
-                        if(err) output({error : {description: err.message}}, null);
-                        else output(null, data);
-                    })
-                    StockModal.getStockByDateProCat( productId, bookingDate, categoryId, (err, data) => {
-                        if(err) {
-                            output(err, null);
-                        } else {
-                            const stockVale = {
-                                stockId: data[0].stockId,
-                                stock: quantity + data[0].stock
-                            }
-                            StockModal.updateStock(stockVale, (err, data) => {
-                                if(err) {
-                                    output(err, null);
-                                } else {
-                                    output(null, data);
-                                }
-                            })
-                        }
-                    })
+    if (bookingStatus === "cancel") {
+        const updateBooking = `UPDATE bookingDetails SET bookingStatus = ? WHERE bookingId = ?`;
+        pool.query(updateBooking, [bookingStatus, bookingId], (err, result) => {
+            if (err) {
+                return output({ error: { description: err.message } }, null);  // <-- Ensure the function returns after sending the error
+            }
+            
+            const getBooking = `SELECT * FROM bookingDetails WHERE bookingId = ?`;
+            pool.query(getBooking, [bookingId], (err, data) => {
+                if (err) {
+                    return output({ error: { description: err.message } }, null);  // <-- Ensure the function returns after sending the error
                 }
-            })
-        } else {
-            output({ error: { description: "Booking is already cancelled" } }, null);
-        }
 
-        
-}
+                StockModal.getStockByDateProCat(productId, bookingDate, categoryId, (err, data) => {
+                    if (err) {
+                        return output(err, null);  // <-- Ensure the function returns after sending the error
+                    }
+
+                    const stockValue = {
+                        stockId: data[0].stockId,
+                        stock: quantity + data[0].stock
+                    };
+
+                    StockModal.updateStock(stockValue, (err, stockData) => {
+                        if (err) {
+                            return output(err, null);  // <-- Ensure the function returns after sending the error
+                        }
+                        
+                        return output(null, { bookingData: data, stockData });  // <-- Ensure the function returns after sending the response
+                    });
+                });
+            });
+        });
+    } else {
+        return output({ error: { description: "Booking is already cancelled" } }, null);  // <-- Ensure the function returns after sending the response
+    }
+};
+
 
 module.exports = BookingModal;

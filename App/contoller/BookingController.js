@@ -26,7 +26,7 @@ exports.Booking = (req, res) => {
 
 exports.getBookingCustomerID = (req, res) => {
     try {
-        const { customerId} = req.body;
+        const { customerId} = req.query;
 
         if (!customerId ) {
             res.status(400).send({ message: "Missing parameters" });
@@ -83,17 +83,21 @@ exports.getOverallBooking = (req, res) => {
 
 exports.updateBooking = (req, res) => {
     try {
-        const {bookingId, productId, quantity, bookingDate, categoryId, bookingStatus} = req.body;
-        if(!bookingId || !productId || !quantity || !bookingDate || !categoryId || !bookingStatus) {
+        const { bookingId, productId, quantity, bookingDate, categoryId, bookingStatus } = req.body;
+        if (!bookingId || !productId || !quantity || !bookingDate || !categoryId || !bookingStatus) {
             res.status(400).send({ message: "Check data" });
-        } else {
-            BookingModal.updateBooking (req.body, (err, data) => {
-                if(err) res.status(400).send(err.error);
-                else res.send(data);
-            });
+            return;  // <-- Ensure no further code is executed after sending the response
         }
-
-    } catch(e) {
-        throw(e);
+        BookingModal.updateBooking(req.body, (err, data) => {
+            if (err) {
+                res.status(400).send(err.error);
+                return;  // <-- Ensure no further code is executed after sending the response
+            } else {
+                res.send(data);
+            }
+        });
+    } catch (e) {
+        res.status(500).send({ error: e.message });
     }
-}
+};
+
