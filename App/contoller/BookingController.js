@@ -77,9 +77,29 @@ exports.getOverallBooking = (req, res) => {
         else res.send(data);
       });
     } catch (e) {
-      throw e;
+        console.error("Server error:", e); // Log the exception for debugging
+        res.status(500).send({ message: "Server error" });
     }
   };
+
+exports.getCompletedBooking = (req, res) => {
+    try {
+        let {offSet, limit} = req.query        
+        if(!offSet || !limit) {
+            res.status(400).send({ message: "Missing parameters" });
+        } else {
+            offSet = Number(offSet);
+            limit = Number(limit);
+            BookingModal.getCompletedBooking(offSet, limit, (err, data) =>{
+                if(err) res.status(400).send(err.error);
+                else res.send(data);
+            })
+        }
+    } catch (e) {
+        console.error("Server error:", e);
+        res.status(500).send({ message: "Server error" });
+    }
+}
 
 exports.updateBooking = (req, res) => {
     try {

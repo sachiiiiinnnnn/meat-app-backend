@@ -4,7 +4,7 @@ const moment = require("moment")
 
 const BookingModal = function (req) {};
 
-const baseUrl = "http://192.168.0.231:8080/uploads/products";
+const baseUrl = "http://192.168.0.119:8080/uploads/products";
 
 
 BookingModal.booking = (input, output) => {
@@ -124,6 +124,31 @@ BookingModal.getOverallBooking = (output) => {
       }
     });
   };
+
+BookingModal.getCompletedBooking = (offSet, limit, output) => {
+  const getPaymentHistory = `SELECT bookingdetails.*, categorydetails.categoryName, productdetails.productName, customerdetails.customerName
+    FROM bookingdetails
+    JOIN categorydetails
+    ON categorydetails.categoryId = bookingdetails.categoryId
+    JOIN productdetails
+    ON productdetails.productId = bookingdetails.productId
+    JOIN customerdetails
+    ON customerdetails.customerId = bookingdetails.customerId
+    WHERE bookingdetails.bookingStatus = "completed"
+    LIMIT ? OFFSET ?;`;
+
+        pool.query(getPaymentHistory, [limit, offSet], (err, result) => {
+            if(err) {
+                output({error: {description: err}}, null);
+            } else {
+                const fromettedResults = result.map(row => ({
+                    ...row,
+                    bookingDate: moment(row.bookingDate).format('YYYY-MM-DD')
+                }))
+                output(null, fromettedResults);
+            }
+        })
+}
 
 // BookingModal.updateBooking = (input, output) => {
 //         const {bookingId, productId, quantity, bookingDate, categoryId, bookingStatus} = input;

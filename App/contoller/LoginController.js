@@ -12,7 +12,7 @@ exports.Login = (req, res) => {
     // First, validate the OTP
     LoginModal.login(req.body, (err, result) => {
       if (err) return res.status(400).send(err.error);
-
+      
       if (result.valid) {
         // OTP is valid, now update user details
         LoginModal.updateUserDetails(req.body, (err, updateResult) => {
