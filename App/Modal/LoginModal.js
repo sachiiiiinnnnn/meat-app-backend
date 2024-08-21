@@ -3,7 +3,7 @@ const twilioDeatils = require("../../index")
 const client = require("twilio")(twilioDeatils.accountSid, twilioDeatils.authToken);
 const { Login } = require("../contoller/LoginController");
 
-const baseUrl = "http://192.168.0.231:8080/uploads/profile";
+const baseUrl = "http://192.168.0.119:8080/uploads/profile";
 
 const LoginModal = function (req) { };
 
@@ -50,13 +50,6 @@ LoginModal.login = (input, output) => {
 // };
 
 
-
-
-
-
-
-
-
 LoginModal.updateUserDetails = (input, output) => {
   const { customerName, customerEmail, customerId } = input;
 
@@ -82,15 +75,18 @@ LoginModal.updateUserDetails = (input, output) => {
     if (err) {
       return output({ error: { description: err.message } }, null);
     }
-
-    output(null, { result });
+    const customersWithImageUrls = result.map(customer => {
+      return {
+        ...customer,
+        image: customer.image ? `${baseUrl}/${customer.image}` : null
+      };
+    });
+    output(null, customersWithImageUrls );
   });
 } else {
-  // Handle case where neither customerName, customerEmail, nor customerId is provided
   output({ error: { description: "Missing required parameters" } }, null);
 }
 };
-
 
 LoginModal.getLogin = (input, output) => {
   const getUser = `SELECT * FROM customerdetails`;
@@ -134,9 +130,6 @@ LoginModal.getCustomerById = (customerId, output) => {
     }
   });
 };
-
-
-
 
 LoginModal.checkUserExists = ({ customerMobile }, output) => {
   const query = `SELECT * FROM customerdetails WHERE customerMobile = ?`;

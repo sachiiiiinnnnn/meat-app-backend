@@ -93,6 +93,7 @@ module.exports = (App) => {
   router.get("/user/Booking/CustomerId", Booking.getBookingCustomerID);
   router.put("/user/Booking", Booking.updateBooking);
   router.get("/user/Overall/Booking", Booking.getOverallBooking);
+  router.get("/user/OverAll/Completed/Booking", Booking.getCompletedBooking)
 
   router.get("/user/Search", Search.getSearch);
   router.get("/user/SearchProduct", Search.getSearchProduct);
