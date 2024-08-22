@@ -5,15 +5,46 @@ const StockModal = function (req) {};
 
 StockModal.Stock = (input, output) => {
   const { stock, stockDate, categoryId, productId } = input;
-  const insertStock = `INSERT INTO stockdetails (stock, stockDate, categoryId, productId) VALUES (?, ?, ?, ?)`;
-  pool.query(insertStock, [stock, stockDate, categoryId, productId], (err, result) => {
-    if(err) {
-        output({ error: { description: err.message } }, null);
+  const selectStock = `SELECT * FROM stockdetails WHERE productId = ? AND stockDate = ? AND categoryId = ?;`;
+  pool.query(selectStock, [productId, stockDate, categoryId], (err, results) => {
+    if (err) {
+      output({ error: { description: err.message } }, null);
+    } else {
+      if (results.length > 0) {
+        const formattedResults = results.map(row => ({
+          ...row,
+          stockDate: moment(row.stockDate).format('YYYY-MM-DD')
+        }));
+        output(null, { message: "Stock will have Already!", formattedResults});
       } else {
-        output(null, { message: "stock details inserted successfully", result});
+        const insertStock = `INSERT INTO stockdetails (stock, stockDate, categoryId, productId) VALUES (?, ?, ?, ?)`;
+        pool.query(insertStock, [stock, stockDate, categoryId, productId], (err, result) => {
+          if(err) {
+              output({ error: { description: err.message } }, null);
+            } else {
+              const getValue = `SELECT * FROM stockdetails WHERE productId = ? AND stockDate = ? AND categoryId = ?;`
+              pool.query(getValue, [productId, stockDate, categoryId], (err, data) => {
+                if(err) {
+                  output({ error: { description: err.message } }, null)
+                } else {
+                  const formattedResults = results.map(row => ({
+                    ...row,
+                    stockDate: moment(row.stockDate).format('YYYY-MM-DD')
+                  }));
+                  output(null, { message: "stock details inserted successfully", formattedResults});
+                }
+                
+              }
+              )
+            }
+          }
+        );
       }
     }
-  );
+  });
+
+  
+  
 };
 
 StockModal.getStock = (callback) => {
