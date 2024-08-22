@@ -77,7 +77,7 @@ OfferModal.offerGetByOfferType = (offerType, offerStatus, callback) => {
                           on categorydetails.categoryId = offerdetails.categoryId
                           JOIN productdetails 
                           on productdetails.productId = offerdetails.productId 
-                          WHERE offerdetails.offerType = ? AND CURRENT_DATE < fromDate`;
+                          WHERE offerdetails.customerType = "All" AND offerdetails.offerType = ? AND CURRENT_DATE < fromDate`;
     } else if(offerStatus === "active") {
       getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
                           FROM offerdetails
@@ -85,7 +85,7 @@ OfferModal.offerGetByOfferType = (offerType, offerStatus, callback) => {
                           on categorydetails.categoryId = offerdetails.categoryId
                           JOIN productdetails 
                           on productdetails.productId = offerdetails.productId 
-                          WHERE offerdetails.offerType = ? AND CURRENT_DATE >= fromDate AND CURRENT_DATE <= endDate`;
+                          WHERE offerdetails.customerType = "All" AND offerdetails.offerType = ? AND CURRENT_DATE >= fromDate AND CURRENT_DATE <= endDate`;
     } else {
       getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
                           FROM offerdetails
@@ -93,7 +93,7 @@ OfferModal.offerGetByOfferType = (offerType, offerStatus, callback) => {
                           on categorydetails.categoryId = offerdetails.categoryId
                           JOIN productdetails 
                           on productdetails.productId = offerdetails.productId 
-                          WHERE offerdetails.offerType = ? AND CURRENT_DATE > endDate`;
+                          WHERE offerdetails.customerType = "All" AND offerdetails.offerType = ? AND CURRENT_DATE > endDate`;
     }
     pool.query(getOfferByOffType, [offerType], (err, result) => {
       if (err) {
@@ -116,7 +116,7 @@ OfferModal.offerGetByOfferType = (offerType, offerStatus, callback) => {
                           on categorydetails.categoryId = offerdetails.categoryId
                           JOIN productdetails 
                           on productdetails.productId = offerdetails.productId 
-                          WHERE offerdetails.offerType = ? AND CURRENT_DATE < fromDate`;
+                          WHERE offerdetails.customerType = "All" AND offerdetails.offerType = ? AND CURRENT_DATE < fromDate`;
     } else if(offerStatus === "active") {
       getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
                           FROM offerdetails
@@ -124,7 +124,7 @@ OfferModal.offerGetByOfferType = (offerType, offerStatus, callback) => {
                           on categorydetails.categoryId = offerdetails.categoryId
                           JOIN productdetails 
                           on productdetails.productId = offerdetails.productId 
-                          WHERE offerdetails.offerType = ? AND CURRENT_DATE >= fromDate AND CURRENT_DATE <= endDate`;
+                          WHERE offerdetails.customerType = "All" AND offerdetails.offerType = ? AND CURRENT_DATE >= fromDate AND CURRENT_DATE <= endDate`;
     } else {
       getOfferByOffType = `SELECT offerdetails.*, categorydetails.categoryName, productdetails.productName
                           FROM offerdetails
@@ -132,7 +132,7 @@ OfferModal.offerGetByOfferType = (offerType, offerStatus, callback) => {
                           on categorydetails.categoryId = offerdetails.categoryId
                           JOIN productdetails 
                           on productdetails.productId = offerdetails.productId 
-                          WHERE offerdetails.offerType = ? AND CURRENT_DATE > endDate`;
+                          WHERE offerdetails.customerType = "All" AND offerdetails.offerType = ? AND CURRENT_DATE > endDate`;
     }
     pool.query(getOfferByOffType, [offerType], (err, result) => {
       if (err) {
