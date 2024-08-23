@@ -59,13 +59,14 @@ module.exports = (App) => {
 
 
   router.post("/user/Login", Login.Login); 
+  router.post("/user/Login/Otp", Login.generateOtp);
   router.get("/user/Login", Login.getLogin);
   router.get("/user/Login/CustomerId", Login.getCustomerId);
-  router.post("/user/Login/Otp", Login.generateOtp);
+  router.get("/user/Login/Customer/Filter", Login.getCustomerFilter);
   router.put("/user/Login/Edit", Login.updateLogin);
   router.put("/user/Login/customerProfile", uploadProfile.single('image'), Login.updateProfiles)
 
-  
+   
   router.post("/user/Category", uploadCategory.single('image'), Category.Category);
   router.get("/user/Category", Category.getCategory);
   router.get("/user/Category/ById", Category.getCategoryById);
@@ -112,6 +113,9 @@ module.exports = (App) => {
   router.get("/user/offer/byOfferType", Offer.offerGetByOfferType);
   router.put("/user/offer", Offer.updateOffer)
   router.delete("/user/offer", Offer.OfferDelete);
+
+
+  // router.post("/user/Complaints", Complaints.Complaints);
 
   // router.post("/user/Cart", Cart.Cart);
   // router.get("/user/Cart", Cart.getCart);
