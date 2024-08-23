@@ -10,81 +10,63 @@ BookingModal.booking = (input, output) => {
   const bookings = Array.isArray(input) ? input : [input]; // Ensure bookings is an array
 
   const processBooking = (booking, callback) => {
-    const {
-      productId,
-      customerId,
-      locationId,
-      quantity,
-      amount,
-      categoryId,
-      paymentMode,
-      bookingDate,
-      bookingStartTime,
-      bookingEndTime,
-      bookingStatus,
-    } = booking;
+    const {productId, customerId, locationId, quantity, amount, categoryId, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus} = booking;
     const now = new Date();
     const currentDate = now.toISOString().split("T")[0];
     const currentTime = now.toTimeString().split(" ")[0];
-    StockModal.getStockById(
-      productId,
-      bookingDate,
-      categoryId,
-      (productErr, stockDetails) => {
+    StockModal.getStockById(productId, bookingDate, categoryId, (productErr, stockDetails) => {
         if (productErr) {
-          callback({ error: { description: "Product not found" } });
+          callback({ error: { description: "Product not found in this date" } });
         } else if (!stockDetails) {
           callback({ error: { description: "Product not found" } });
         } else {
           const stockDate = stockDetails.stockDate;
           if (stockDetails.stock === 0) {
             callback({ error: { description: "Out of Stock" } });
-          } else if (
-            stockDetails.stock < quantity &&
-            bookingDate === stockDate
-          ) {
+          } else if (stockDetails.stock >= quantity) {
+            const insertBooking = `INSERT INTO bookingDetails (productId, customerId, locationId, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus, categoryId, orderedDate, orderedTime ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+              const values = [
+                productId,
+                customerId,
+                locationId,
+                quantity,
+                amount,
+                paymentMode,
+                bookingDate,
+                bookingStartTime,
+                bookingEndTime,
+                bookingStatus,
+                categoryId,
+                currentDate,
+                currentTime,
+              ];
+
+              pool.query(insertBooking, values, (err, result) => {
+                if (err) {
+                  callback({ error: { description: err.message } });
+                } else {
+                  const updatedStocks = stockDetails.stock - quantity;
+                  StockModal.UpdatesProductStock(
+                    productId,
+                    stockDate,
+                    updatedStocks,
+                    (updateErr, updateData) => {
+                      if (updateErr) {
+                        callback({ error: { description: updateErr.message } });
+                      } else {
+                        callback(null, "Booking and stock update successful");
+                      }
+                    }
+                  );
+                }
+              });
+          } else {
             callback({
               error: {
                 description: `Only ${stockDetails.stock} items available in stock`,
               },
             });
-          } else {
-            const insertBooking = `INSERT INTO bookingDetails (productId, customerId, locationId, quantity, amount, paymentMode, bookingDate, bookingStartTime, bookingEndTime, bookingStatus, categoryId, orderedDate, orderedTime ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-            const values = [
-              productId,
-              customerId,
-              locationId,
-              quantity,
-              amount,
-              paymentMode,
-              bookingDate,
-              bookingStartTime,
-              bookingEndTime,
-              bookingStatus,
-              categoryId,
-              currentDate,
-              currentTime,
-            ];
-
-            pool.query(insertBooking, values, (err, result) => {
-              if (err) {
-                callback({ error: { description: err.message } });
-              } else {
-                const updatedStocks = stockDetails.stock - quantity;
-                StockModal.UpdatesProductStock(
-                  productId,
-                  stockDate,
-                  updatedStocks,
-                  (updateErr, updateData) => {
-                    if (updateErr) {
-                      callback({ error: { description: updateErr.message } });
-                    } else {
-                      callback(null, "Booking and stock update successful");
-                    }
-                  }
-                );
-              }
-            });
+            
           }
         }
       }
@@ -172,7 +154,7 @@ BookingModal.getOverallBooking = (limit,offSet,output) => {
 };
 
 BookingModal.getCompletedBooking = (offSet, limit, output) => {
-  const getPaymentHistory = `SELECT bookingdetails.*, categorydetails.categoryName, productdetails.productName, customerdetails.customerName, customerdetails.customerMobile
+  const getPaymentHistory = `SELECT COUNT(*) OVER() AS NoOfBookings, bookingdetails.*, categorydetails.categoryName, productdetails.productName, customerdetails.customerName, customerdetails.customerMobile
     FROM bookingdetails
     JOIN categorydetails
     ON categorydetails.categoryId = bookingdetails.categoryId
@@ -289,16 +271,11 @@ BookingModal.updateBooking = (input, output) => {
   }
 };
 
-BookingModal.getbookingByTodayOrAdvanced = (
-    bookingTodayOrTommorrow,
-    offSet,
-    limit,
-    output
-  ) => {
+BookingModal.getbookingByTodayOrAdvanced = (bookingTodayOrTommorrow, offSet, limit, output) => {  
     let getBookingType;
     
-    if (bookingTodayOrTommorrow === "Today") {
-      getBookingType = `SELECT bookingdetails.*, categorydetails.categoryName, productdetails.productName, locationdetails.location, customerdetails.customerName 
+    if (bookingTodayOrTommorrow === "todayOrder") {
+      getBookingType = `SELECT bookingdetails.*, categorydetails.categoryName, productdetails.productName, locationdetails.location, customerdetails.customerName, customerdetails.customerMobile
                         FROM bookingdetails 
                         JOIN customerdetails ON customerdetails.customerId = bookingdetails.customerId
                         JOIN categorydetails ON categorydetails.categoryId = bookingdetails.categoryId
@@ -307,7 +284,7 @@ BookingModal.getbookingByTodayOrAdvanced = (
                         WHERE CURRENT_DATE = bookingdetails.bookingDate
                         LIMIT ? OFFSET ?;`;
     } else {
-      getBookingType = `SELECT bookingdetails.*, categorydetails.categoryName, productdetails.productName, locationdetails.location, customerdetails.customerName 
+      getBookingType = `SELECT bookingdetails.*, categorydetails.categoryName, productdetails.productName, locationdetails.location, customerdetails.customerName, customerdetails.customerMobile 
                         FROM bookingdetails 
                         JOIN customerdetails ON customerdetails.customerId = bookingdetails.customerId
                         JOIN categorydetails ON categorydetails.categoryId = bookingdetails.categoryId
