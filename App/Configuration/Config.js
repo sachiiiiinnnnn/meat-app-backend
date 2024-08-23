@@ -121,6 +121,20 @@ pool.connect(function (err) {
 //     FOREIGN KEY (productId) REFERENCES productdetails(productId)
 // ); `;
 
+
+const createComplaintDetail = `CREATE TABLE IF NOT EXISTS complaintdetails (
+    complaintId INT NOT NULL AUTO_INCREMENT,
+    customerId INT NOT NULL,
+    issue varchar(225) NOT NULL,
+    descriptions varchar(225) NOT NULL,
+    complaintDate  DATE NOT NULL,
+    customerMobile varchar(225) NOT NULL,
+    complaintStatus varchar(225) NOT NULL,
+    PRIMARY KEY (complaintId),
+    FOREIGN KEY (customerId) REFERENCES customerdetails(customerId)
+); `;
+
+
     // Execute each query separately
     pool.query(createCustomerDetails, function (err, results, fields) {
       if (err) console.log(err.message);
@@ -162,7 +176,10 @@ pool.connect(function (err) {
       else console.log("Offerdetail table create successfully");
     });
 
-    
+    pool.query(createComplaintDetail, function (err, result, fields) {
+      if (err) console.log(err.message);
+      else console.log("complaintdetails table create successfully");
+    });
     // pool.query(createCart, function (err, result, fields) {
     //   if (err) console.log(err.message);
     //   else console.log("cart table create successfully");

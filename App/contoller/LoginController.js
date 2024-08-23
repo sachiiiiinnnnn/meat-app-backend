@@ -58,6 +58,20 @@ exports.getCustomerId = (req, res) => {
   }
 };
 
+exports.getCustomerFilter = (req, res) => {
+  const { customerName, customerEmail, customerMobile } = req.query;
+
+  try {
+      LoginModal.getCustomerFilter(customerName, customerEmail, customerMobile, (err, data) => {
+          if (err) res.status(400).send({ error: err.error });
+          else res.send(data);
+      });
+  } catch (e) {
+      res.status(500).send({ message: "Internal Server Error" });
+  }
+}
+
+
 exports.generateOtp = (req, res) => {
   const { customerMobile } = req.body;
 

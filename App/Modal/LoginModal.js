@@ -3,7 +3,7 @@ const twilioDeatils = require("../../index")
 const client = require("twilio")(twilioDeatils.accountSid, twilioDeatils.authToken);
 const { Login } = require("../contoller/LoginController");
 
-const baseUrl = "http://192.168.0.119:8080/uploads/profile";
+const baseUrl = "http://192.168.1.18:8080/uploads/profile";
 
 const LoginModal = function (req) { };
 
@@ -61,7 +61,6 @@ LoginModal.updateUserDetails = (input, output) => {
     if (err) {
       return output({ error: { description: err.message } }, null);
     }
-
     pool.query(query1, [customerId], (err, result) => {
       if (err) {
         return output({ error: { description: err.message } }, null);
@@ -75,12 +74,12 @@ LoginModal.updateUserDetails = (input, output) => {
     if (err) {
       return output({ error: { description: err.message } }, null);
     }
-    const customersWithImageUrls = result.map(customer => {
+        const customersWithImageUrls = result.map(customer => {
       return {
         ...customer,
         image: customer.image ? `${baseUrl}/${customer.image}` : null
       };
-    });
+    });    
     output(null, customersWithImageUrls );
   });
 } else {
@@ -103,6 +102,39 @@ LoginModal.getLogin = (input, output) => {
     }
   });
 };
+
+LoginModal.getCustomerFilter = (customerName, customerEmail, customerMobile, output) => {
+  let query = `SELECT * FROM customerdetails WHERE 1=1`;
+  let queryParams = [];
+
+  if (customerName) {
+      query += ` AND customerName LIKE ?`;
+      queryParams.push(`%${customerName}%`);
+  }
+
+  if (customerEmail) {
+      query += ` AND customerEmail LIKE ?`;
+      queryParams.push(`%${customerEmail}%`);
+  }
+
+  if (customerMobile) {
+      query += ` AND customerMobile LIKE ?`;
+      queryParams.push(`%${customerMobile}%`);
+  }
+
+  pool.query(query, queryParams, (err, result) => {
+      if (err) {
+          output({ error: { description: err.message } }, null);
+      } else {
+          const profileWithImageUrls = result.map(customer => ({
+              ...customer,
+              image: `${baseUrl}/${customer.image}`
+          }));
+          output(null, profileWithImageUrls);
+      }
+  });
+};
+
 
 // Function to retrieve a customer by ID
 LoginModal.getCustomerById = (customerId, output) => {
