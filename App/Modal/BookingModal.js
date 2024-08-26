@@ -4,7 +4,7 @@ const moment = require("moment");
 
 const BookingModal = function (req) {};
 
-const baseUrl = "http://192.168.0.119:8080/uploads/products";
+const baseUrl = "http://192.168.1.6:8080/uploads/products";
 
 BookingModal.booking = (input, output) => {
   const bookings = Array.isArray(input) ? input : [input]; // Ensure bookings is an array
