@@ -13,6 +13,8 @@ module.exports = (App) => {
   const Search = require("../contoller/SearchController");
   const Stock = require("../contoller/StockController");
   const Offer = require("../contoller/OfferController");
+  const Complaints = require("../contoller/ComplaintController");
+
   // const Cart = require("../contoller/CartController");
 
 
@@ -115,7 +117,7 @@ module.exports = (App) => {
   router.delete("/user/offer", Offer.OfferDelete);
 
 
-  // router.post("/user/Complaints", Complaints.Complaints);
+  router.post("/user/Complaints", Complaints.Complaints);
 
   // router.post("/user/Cart", Cart.Cart);
   // router.get("/user/Cart", Cart.getCart);
